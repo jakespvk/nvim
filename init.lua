@@ -16,7 +16,7 @@ return require('packer').startup(function(use)
 
     use ('tjdevries/colorbuddy.nvim')
     -- theme
-    use { 'kartikp10/noctis.nvim', requires = { 'rktjmp/lush.nvim' } }
+    use { 'whatyouhide/vim-gotham' }
 
     use ('nvim-treesitter/nvim-treesitter', {run = ':TSUpdate'})
     use ('nvim-treesitter/playground')
@@ -191,7 +191,7 @@ vim.g.mapleader = " "
 
 -- colors.lua
 -- vim.o.background = "dark" -- or "light" for light mode
-vim.cmd([[colorscheme noctis]])
+vim.cmd([[colorscheme gotham]])
 vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 
