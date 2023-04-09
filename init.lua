@@ -188,9 +188,11 @@ vim.g.mapleader = " "
 
 -- colors.lua
 -- vim.o.background = "dark" -- or "light" for light mode
-vim.cmd([[colorscheme gruvbox * highlight SignColumn guibg=NONE]])
+vim.cmd([[colorscheme gruvbox]])
+--  * highlight SignColumn guibg=NONE
 vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
 -- :highlight SignColumn guibg=NONE
 
 -- fugitive.lua
