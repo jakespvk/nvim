@@ -16,13 +16,10 @@ return require('packer').startup(function(use)
 
     use ('tjdevries/colorbuddy.nvim')
     -- theme
-    use { 'whatyouhide/vim-gotham' }
+    use ('ellisonleao/gruvbox.nvim') 
 
     use ('nvim-treesitter/nvim-treesitter', {run = ':TSUpdate'})
     use ('nvim-treesitter/playground')
-    use ('windwp/nvim-autopairs')
-    use ('windwp/nvim-ts-autotag')
-    require('nvim-ts-autotag').setup()
 
     use ('theprimeagen/harpoon')
     use ('mbbill/undotree')
@@ -68,8 +65,8 @@ return require('packer').startup(function(use)
         options = {
             icons_enabled = true,
             theme = 'auto',
-            component_separators = { left = '', right = ''},
-            section_separators = { left = '', right = ''},
+            component_separators = { none },
+            section_separators = { none },
             disabled_filetypes = {
                 statusline = {},
                 winbar = {},
@@ -191,9 +188,10 @@ vim.g.mapleader = " "
 
 -- colors.lua
 -- vim.o.background = "dark" -- or "light" for light mode
-vim.cmd([[colorscheme gotham]])
+vim.cmd([[colorscheme gruvbox * highlight SignColumn guibg=NONE]])
 vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+-- :highlight SignColumn guibg=NONE
 
 -- fugitive.lua
 vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
@@ -272,7 +270,7 @@ require 'nvim-treesitter.install'.prefer_git = false
 
 require'nvim-treesitter.configs'.setup {
   -- A list of parser names, or "all" (the five listed parsers should always be installed)
-  ensure_installed = { "javascript", "lua", "c", "vim", "help", "query" },
+  ensure_installed = { "javascript", "lua", "c", "vim", "query" },
 
   -- Install parsers synchronously (only applied to `ensure_installed`)
   sync_install = false,
