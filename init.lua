@@ -258,6 +258,8 @@ end)
 
 lsp.setup()
 
+vim.diagnostic.config({ virtual_text = true })
+
 -- telescope
 local builtin = require('telescope.builtin')
 vim.keymap.set('n', '<leader>pf', builtin.find_files, {})
