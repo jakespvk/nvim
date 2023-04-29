@@ -17,7 +17,8 @@ return require('packer').startup(function(use)
     use ('tjdevries/colorbuddy.nvim')
     use ('folke/lsp-colors.nvim')
     -- theme
-    use ('folke/tokyonight.nvim')
+    use { "bluz71/vim-moonfly-colors", as = "moonfly" }
+    -- use ('folke/tokyonight.nvim')
     --use({ 'rose-pine/neovim', as = 'rose-pine' })
     --use 'Mofiqul/dracula.nvim'
     --use { 'uloco/bluloco.nvim', requires = { 'rktjmp/lush.nvim' } }
@@ -26,6 +27,7 @@ return require('packer').startup(function(use)
     --use ('ellisonleao/gruvbox.nvim')
 
     use ('nvim-treesitter/nvim-treesitter', {run = ':TSUpdate'})
+    use ('nvim-treesitter/nvim-treesitter-context')
     use ('nvim-treesitter/playground')
 
     use ('theprimeagen/harpoon')
@@ -286,12 +288,15 @@ vim.g.mapleader = " "
 --vim.cmd([[colorscheme ayu]])
 --vim.cmd([[colorscheme oxocarbon]])
 --vim.cmd([[colorscheme dracula]])
---vim.cmd('colorscheme rose-pine')
-vim.cmd('colorscheme tokyonight')
+--vim.cmd('colorscheme rose-pine')vim.cmd('colorscheme tokyonight')
+vim.cmd('colorscheme moonfly')
 --  * highlight SignColumn guibg=NONE
 vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
+vim.api.nvim_set_hl(0, "LineNr", { bg = "none" })
+vim.api.nvim_set_hl(0, "DiagnosticSignWarn", { bg = "none", fg = "yellow" })
+vim.api.nvim_set_hl(0, "DiagnosticSignError", { bg = "none", fg = "red" })
 -- :highlight SignColumn guibg=NONE
 
 -- fugitive.lua
