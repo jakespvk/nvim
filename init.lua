@@ -17,18 +17,22 @@ return require('packer').startup(function(use)
     use ('tjdevries/colorbuddy.nvim')
     use ('folke/lsp-colors.nvim')
     -- theme
-    use { "bluz71/vim-moonfly-colors", as = "moonfly" }
+    --use { "bluz71/vim-moonfly-colors", as = "moonfly" }
     -- use ('folke/tokyonight.nvim')
     --use({ 'rose-pine/neovim', as = 'rose-pine' })
     --use 'Mofiqul/dracula.nvim'
     --use { 'uloco/bluloco.nvim', requires = { 'rktjmp/lush.nvim' } }
     --use {'nyoom-engineering/oxocarbon.nvim'}
-    -- use ('Shatur/neovim-ayu')
-    --use ('ellisonleao/gruvbox.nvim')
+    --use ('Shatur/neovim-ayu')
+    use ('ellisonleao/gruvbox.nvim')
 
     use ('nvim-treesitter/nvim-treesitter', {run = ':TSUpdate'})
     use ('nvim-treesitter/nvim-treesitter-context')
     use ('nvim-treesitter/playground')
+
+    -- autotag
+    use ('windwp/nvim-ts-autotag')
+
 
     use ('theprimeagen/harpoon')
     use ('mbbill/undotree')
@@ -187,7 +191,9 @@ return require('packer').startup(function(use)
         inactive_winbar = {},
         extensions = {}
     }
-		
+
+    require('nvim-ts-autotag').setup()
+
 -- netrw
 vim.g.netrw_browse_split = 0
 vim.g.netrw_banner = 0
@@ -284,19 +290,24 @@ vim.g.mapleader = " "
 
 -- colors.lua
 -- vim.o.background = "dark" -- or "light" for light mode
---vim.cmd([[colorscheme gruvbox]])
+require('gruvbox').setup({
+    italic = {false},
+    transparent_mode = true,
+})
+vim.cmd('colorscheme gruvbox')
 --vim.cmd([[colorscheme ayu]])
 --vim.cmd([[colorscheme oxocarbon]])
 --vim.cmd([[colorscheme dracula]])
 --vim.cmd('colorscheme rose-pine')vim.cmd('colorscheme tokyonight')
-vim.cmd('colorscheme moonfly')
+-- vim.cmd('colorscheme moonfly')
+--vim.cmd('colorscheme gruvbox')
 --  * highlight SignColumn guibg=NONE
 vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
 vim.api.nvim_set_hl(0, "LineNr", { bg = "none" })
-vim.api.nvim_set_hl(0, "DiagnosticSignWarn", { bg = "none", fg = "yellow" })
-vim.api.nvim_set_hl(0, "DiagnosticSignError", { bg = "none", fg = "red" })
+--vim.api.nvim_set_hl(0, "DiagnosticSignWarn", { bg = "none", fg = "yellow" })
+--vim.api.nvim_set_hl(0, "DiagnosticSignError", { bg = "none", fg = "red" })
 -- :highlight SignColumn guibg=NONE
 
 -- fugitive.lua
@@ -323,7 +334,7 @@ lsp.ensure_installed({
     'html',
     'tsserver',
 	'eslint',
-   -- 'lua_language_server',
+    --'lua_language_server',
 	'rust_analyzer',
 })
 
