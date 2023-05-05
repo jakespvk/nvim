@@ -25,6 +25,7 @@ return require('packer').startup(function(use)
     --use {'nyoom-engineering/oxocarbon.nvim'}
     --use ('Shatur/neovim-ayu')
     use ('ellisonleao/gruvbox.nvim')
+    --use ('sainnhe/gruvbox-material')
 
     use ('nvim-treesitter/nvim-treesitter', {run = ':TSUpdate'})
     use ('nvim-treesitter/nvim-treesitter-context')
@@ -33,6 +34,20 @@ return require('packer').startup(function(use)
     -- autotag
     use ('windwp/nvim-ts-autotag')
 
+    -- git blame
+    use ('f-person/git-blame.nvim')
+    -- trouble
+    use({
+        "folke/trouble.nvim",
+        config = function()
+            require("trouble").setup {
+                icons = false,
+                -- your configuration comes here
+                -- or leave it empty to use the default settings
+                -- refer to the configuration section below
+            }
+        end
+    })
 
     use ('theprimeagen/harpoon')
     use ('mbbill/undotree')
@@ -266,7 +281,7 @@ vim.opt.expandtab = true
 vim.opt.smartindent = true
 
 -- word wrap
--- --vim.opt.wrap = false
+vim.opt.wrap = false
 
 vim.opt.swapfile = false
 vim.opt.backup = false
@@ -282,48 +297,31 @@ vim.opt.scrolloff = 8
 vim.opt.signcolumn = "yes"
 vim.opt.isfname:append("@-@")
 
-vim.opt.updatetime = 50
+
+
+
+
+
+
+
+-- did this fix freezing ???
+--vim.opt.updatetime = 50
+
+
+
+
+
+
+
+
+
+
+
+
 
 vim.opt.colorcolumn = "80"
 
 vim.g.mapleader = " "
-
--- colors.lua
--- vim.o.background = "dark" -- or "light" for light mode
-require('gruvbox').setup({
-    italic = {false},
-    transparent_mode = true,
-})
-vim.cmd('colorscheme gruvbox')
---vim.cmd([[colorscheme ayu]])
---vim.cmd([[colorscheme oxocarbon]])
---vim.cmd([[colorscheme dracula]])
---vim.cmd('colorscheme rose-pine')vim.cmd('colorscheme tokyonight')
--- vim.cmd('colorscheme moonfly')
---vim.cmd('colorscheme gruvbox')
---  * highlight SignColumn guibg=NONE
-vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
-vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
-vim.api.nvim_set_hl(0, "LineNr", { bg = "none" })
---vim.api.nvim_set_hl(0, "DiagnosticSignWarn", { bg = "none", fg = "yellow" })
---vim.api.nvim_set_hl(0, "DiagnosticSignError", { bg = "none", fg = "red" })
--- :highlight SignColumn guibg=NONE
-
--- fugitive.lua
-vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
-
--- harpoon
-local mark = require("harpoon.mark")
-local ui = require("harpoon.ui")
-
-vim.keymap.set("n", "<leader>a", mark.add_file)
-vim.keymap.set("n", "<C-e>", ui.toggle_quick_menu)
-
-vim.keymap.set("n", "<C-h>", function() ui.nav_file(1) end)
-vim.keymap.set("n", "<C-t>", function() ui.nav_file(2) end)
-vim.keymap.set("n", "<C-n>", function() ui.nav_file(3) end)
-vim.keymap.set("n", "<C-s>", function() ui.nav_file(4) end)
 
 -- lsp
 local lsp = require("lsp-zero")
@@ -334,8 +332,18 @@ lsp.ensure_installed({
     'html',
     'tsserver',
 	'eslint',
-    --'lua_language_server',
 	'rust_analyzer',
+})
+
+-- Fix Undefined global 'vim'
+lsp.configure('lua-language-server', {
+    settings = {
+        Lua = {
+            diagnostics = {
+                globals = { 'vim' }
+            }
+        }
+    }
 })
 
 local cmp = require('cmp')
@@ -348,7 +356,12 @@ local cmp_mappings = lsp.defaults.cmp_mappings({
 })
 
 lsp.set_preferences({
-	sign_icons = { }
+	sign_icons = {
+        error = 'E',
+        warn = 'W',
+        hint = 'H',
+        info = 'I'
+    }
 })
 
 lsp.setup_nvim_cmp({
@@ -373,7 +386,56 @@ end)
 
 lsp.setup()
 
-vim.diagnostic.config({ virtual_text = true })
+vim.diagnostic.config({
+    virtual_text = true
+})
+
+-- colors.lua
+
+--gruvbox material specifics
+--vim.o.background = "dark"
+--vim.g.gruvbox_material_background = "soft"
+--vim.g.gruvbox_material_transparent_background = 2 
+--autocmd ColorScheme * call v:lua.vim.lsp.diagnostic._define_default_signs_and_highlights()
+--vim.cmd('colorscheme gruvbox-material')
+
+vim.o.background = "dark" -- or "light" for light mode
+require('gruvbox').setup({
+    italic = {false},
+    transparent_mode = true,
+    contrast = "soft",
+})
+
+vim.cmd([[colorscheme gruvbox]])
+--vim.cmd([[colorscheme ayu]])
+--vim.cmd([[colorscheme oxocarbon]])
+--vim.cmd([[colorscheme dracula]])
+--vim.cmd('colorscheme rose-pine')vim.cmd('colorscheme tokyonight')
+-- vim.cmd('colorscheme moonfly')
+--vim.cmd('colorscheme gruvbox')
+--  :highlight SignColumn guibg=NONE
+vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
+vim.api.nvim_set_hl(0, "LineNr", { bg = "none" })
+--vim.api.nvim_set_hl(0, "DiagnosticSignWarn", { bg = "none", fg = "yellow" })
+--vim.api.nvim_set_hl(0, "DiagnosticSignError", { bg = "none", fg = "red" })
+-- :highlight SignColumn guibg=NONE
+
+-- fugitive.lua
+vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
+
+-- harpoon
+local mark = require("harpoon.mark")
+local ui = require("harpoon.ui")
+
+vim.keymap.set("n", "<leader>a", mark.add_file)
+vim.keymap.set("n", "<C-e>", ui.toggle_quick_menu)
+
+vim.keymap.set("n", "<C-h>", function() ui.nav_file(1) end)
+vim.keymap.set("n", "<C-t>", function() ui.nav_file(2) end)
+vim.keymap.set("n", "<C-n>", function() ui.nav_file(3) end)
+vim.keymap.set("n", "<C-s>", function() ui.nav_file(4) end)
 
 -- telescope
 local builtin = require('telescope.builtin')
