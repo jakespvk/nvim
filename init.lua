@@ -17,14 +17,14 @@ return require('packer').startup(function(use)
     use ('tjdevries/colorbuddy.nvim')
     use ('folke/lsp-colors.nvim')
     -- theme
+    --use { 'kartikp10/noctis.nvim', requires = { 'rktjmp/lush.nvim' } }
+    --use ('CrispyBaccoon/gruvboxed')
+    use "EdenEast/nightfox.nvim" -- Packer
     --use { "bluz71/vim-moonfly-colors", as = "moonfly" }
-    -- use ('folke/tokyonight.nvim')
     --use({ 'rose-pine/neovim', as = 'rose-pine' })
-    --use 'Mofiqul/dracula.nvim'
     --use { 'uloco/bluloco.nvim', requires = { 'rktjmp/lush.nvim' } }
     --use {'nyoom-engineering/oxocarbon.nvim'}
-    --use ('Shatur/neovim-ayu')
-    use ('ellisonleao/gruvbox.nvim')
+    --use ('ellisonleao/gruvbox.nvim')
     --use ('sainnhe/gruvbox-material')
 
     use ('nvim-treesitter/nvim-treesitter', {run = ':TSUpdate'})
@@ -57,7 +57,6 @@ return require('packer').startup(function(use)
     use ('mbbill/undotree')
     use ('tpope/vim-fugitive')
     use ('muniftanjim/prettier.nvim')
-    use ('lewis6991/gitsigns.nvim')
     use ('folke/neodev.nvim')
     use ('theprimeagen/vim-be-good')
 
@@ -139,10 +138,552 @@ return require('packer').startup(function(use)
     }
 
     -- theming below
+    vim.opt.termguicolors = true
+    use 'kyazdani42/nvim-web-devicons'
     use {
-        'nvim-lualine/lualine.nvim',
-        requires = { 'kyazdani42/nvim-web-devicons', opt = true }
+        'lewis6991/gitsigns.nvim',
+        config = function()
+            require('gitsigns').setup()
+        end
     }
+    use 'freddiehaddad/feline.nvim'
+
+    --local line_ok, feline = pcall(require, "feline")
+    --if not line_ok then
+    --    return
+    --end
+
+    --local one_monokai = {
+    --    fg = "#abb2bf",
+    --    bg = "#1e2024",
+    --    green = "#98c379",
+    --    yellow = "#e5c07b",
+    --    purple = "#c678dd",
+    --    orange = "#d19a66",
+    --    peanut = "#f6d5a4",
+    --    red = "#e06c75",
+    --    aqua = "#61afef",
+    --    darkblue = "#282c34",
+    --    dark_red = "#f75f5f",
+    --}
+
+    --local vi_mode_colors = {
+    --    NORMAL = "green",
+    --    OP = "green",
+    --    INSERT = "yellow",
+    --    VISUAL = "purple",
+    --    LINES = "orange",
+    --    BLOCK = "dark_red",
+    --    REPLACE = "red",
+    --    COMMAND = "aqua",
+    --}
+
+    --local c = {
+    --    vim_mode = {
+    --        provider = {
+    --            name = "vi_mode",
+    --            opts = {
+    --                show_mode_name = true,
+    --                -- padding = "center", -- Uncomment for extra padding.
+    --            },
+    --        },
+    --        hl = function()
+    --            return {
+    --                fg = require("feline.providers.vi_mode").get_mode_color(),
+    --                bg = "darkblue",
+    --                style = "bold",
+    --                name = "NeovimModeHLColor",
+    --            }
+    --        end,
+    --        left_sep = "block",
+    --        right_sep = "block",
+    --    },
+    --    gitBranch = {
+    --        provider = "git_branch",
+    --        hl = {
+    --            fg = "peanut",
+    --            bg = "darkblue",
+    --            style = "bold",
+    --        },
+    --        left_sep = "block",
+    --        right_sep = "block",
+    --    },
+    --    gitDiffAdded = {
+    --        provider = "git_diff_added",
+    --        hl = {
+    --            fg = "green",
+    --            bg = "darkblue",
+    --        },
+    --        left_sep = "block",
+    --        right_sep = "block",
+    --    },
+    --    gitDiffRemoved = {
+    --        provider = "git_diff_removed",
+    --        hl = {
+    --            fg = "red",
+    --            bg = "darkblue",
+    --        },
+    --        left_sep = "block",
+    --        right_sep = "block",
+    --    },
+    --    gitDiffChanged = {
+    --        provider = "git_diff_changed",
+    --        hl = {
+    --            fg = "fg",
+    --            bg = "darkblue",
+    --        },
+    --        left_sep = "block",
+    --        right_sep = "right_filled",
+    --    },
+    --    separator = {
+    --        provider = "",
+    --    },
+    --    fileinfo = {
+    --        provider = {
+    --            name = "file_info",
+    --            opts = {
+    --                type = "relative-short",
+    --            },
+    --        },
+    --        hl = {
+    --            style = "bold",
+    --        },
+    --        left_sep = " ",
+    --        right_sep = " ",
+    --    },
+    --    diagnostic_errors = {
+    --        provider = "diagnostic_errors",
+    --        hl = {
+    --            fg = "red",
+    --        },
+    --    },
+    --    diagnostic_warnings = {
+    --        provider = "diagnostic_warnings",
+    --        hl = {
+    --            fg = "yellow",
+    --        },
+    --    },
+    --    diagnostic_hints = {
+    --        provider = "diagnostic_hints",
+    --        hl = {
+    --            fg = "aqua",
+    --        },
+    --    },
+    --    diagnostic_info = {
+    --        provider = "diagnostic_info",
+    --    },
+    --    lsp_client_names = {
+    --        provider = "lsp_client_names",
+    --        hl = {
+    --            fg = "purple",
+    --            bg = "darkblue",
+    --            style = "bold",
+    --        },
+    --        left_sep = "left_filled",
+    --        right_sep = "block",
+    --    },
+    --    file_type = {
+    --        provider = {
+    --            name = "file_type",
+    --            opts = {
+    --                filetype_icon = true,
+    --                case = "titlecase",
+    --            },
+    --        },
+    --        hl = {
+    --            fg = "red",
+    --            bg = "darkblue",
+    --            style = "bold",
+    --        },
+    --        left_sep = "block",
+    --        right_sep = "block",
+    --    },
+    --    file_encoding = {
+    --        provider = "file_encoding",
+    --        hl = {
+    --            fg = "orange",
+    --            bg = "darkblue",
+    --            style = "italic",
+    --        },
+    --        left_sep = "block",
+    --        right_sep = "block",
+    --    },
+    --    position = {
+    --        provider = "position",
+    --        hl = {
+    --            fg = "green",
+    --            bg = "darkblue",
+    --            style = "bold",
+    --        },
+    --        left_sep = "block",
+    --        right_sep = "block",
+    --    },
+    --    line_percentage = {
+    --        provider = "line_percentage",
+    --        hl = {
+    --            fg = "aqua",
+    --            bg = "darkblue",
+    --            style = "bold",
+    --        },
+    --        left_sep = "block",
+    --        right_sep = "block",
+    --    },
+    --    scroll_bar = {
+    --        provider = "scroll_bar",
+    --        hl = {
+    --            fg = "yellow",
+    --            style = "bold",
+    --        },
+    --    },
+    --}
+
+    --local left = {
+    --    c.vim_mode,
+    --    c.gitBranch,
+    --    c.gitDiffAdded,
+    --    c.gitDiffRemoved,
+    --    c.gitDiffChanged,
+    --    c.separator,
+    --}
+
+    --local middle = {
+    --    c.fileinfo,
+    --    c.diagnostic_errors,
+    --    c.diagnostic_warnings,
+    --    c.diagnostic_info,
+    --    c.diagnostic_hints,
+    --}
+
+    --local right = {
+    --    c.lsp_client_names,
+    --    c.file_type,
+    --    c.file_encoding,
+    --    c.position,
+    --    c.line_percentage,
+    --    c.scroll_bar,
+    --}
+
+    --local components = {
+    --    active = {
+    --        left,
+    --        middle,
+    --        right,
+    --    },
+    --    inactive = {
+    --        left,
+    --        middle,
+    --        right,
+    --    },
+    --}
+
+    --feline.setup({
+    --    components = components,
+    --    theme = one_monokai,
+    --    vi_mode_colors = vi_mode_colors,
+    --})
+
+
+    ---depends om https://github.com/feline-nvim/feline.nvim
+    local present, feline = pcall(require, "feline")
+
+    if not present then
+        return
+    end
+
+    local theme = {
+        aqua = "#7AB0DF",
+        bg = "#1C212A",
+        blue = "#5FB0FC",
+        cyan = "#70C0BA",
+        darkred = "#FB7373",
+        fg = "#C7C7CA",
+        gray = "#222730",
+        green = "#79DCAA",
+        lime = "#54CED6",
+        orange = "#FFD064",
+        pink = "#D997C8",
+        purple = "#C397D8",
+        red = "#F87070",
+        yellow = "#FFE59E"
+    }
+
+    local mode_theme = {
+        ["NORMAL"] = theme.green,
+        ["OP"] = theme.cyan,
+        ["INSERT"] = theme.aqua,
+        ["VISUAL"] = theme.yellow,
+        ["LINES"] = theme.darkred,
+        ["BLOCK"] = theme.orange,
+        ["REPLACE"] = theme.purple,
+        ["V-REPLACE"] = theme.pink,
+        ["ENTER"] = theme.pink,
+        ["MORE"] = theme.pink,
+        ["SELECT"] = theme.darkred,
+        ["SHELL"] = theme.cyan,
+        ["TERM"] = theme.lime,
+        ["NONE"] = theme.gray,
+        ["COMMAND"] = theme.blue,
+    }
+
+    local component = {}
+
+    component.vim_mode = {
+        provider = function()
+            return vim.api.nvim_get_mode().mode:upper()
+        end,
+        hl = function()
+            return {
+                fg = "bg",
+                bg = require("feline.providers.vi_mode").get_mode_color(),
+                style = "bold",
+                name = "NeovimModeHLColor",
+            }
+        end,
+        left_sep = "block",
+        right_sep = "block",
+    }
+
+    component.git_branch = {
+        provider = "git_branch",
+        hl = {
+            fg = "fg",
+            bg = "bg",
+            style = "bold",
+        },
+        left_sep = "block",
+        right_sep = "",
+    }
+
+    component.git_add = {
+        provider = "git_diff_added",
+        hl = {
+            fg = "green",
+            bg = "bg",
+        },
+        left_sep = "",
+        right_sep = "",
+    }
+
+    component.git_delete = {
+        provider = "git_diff_removed",
+        hl = {
+            fg = "red",
+            bg = "bg",
+        },
+        left_sep = "",
+        right_sep = "",
+    }
+
+    component.git_change = {
+        provider = "git_diff_changed",
+        hl = {
+            fg = "purple",
+            bg = "bg",
+        },
+        left_sep = "",
+        right_sep = "",
+    }
+
+    component.separator = {
+        provider = "",
+        hl = {
+            fg = "bg",
+            bg = "bg",
+        },
+    }
+
+    component.diagnostic_errors = {
+        provider = "diagnostic_errors",
+        hl = {
+            fg = "red",
+        },
+    }
+
+    component.diagnostic_warnings = {
+        provider = "diagnostic_warnings",
+        hl = {
+            fg = "yellow",
+        },
+    }
+
+    component.diagnostic_hints = {
+        provider = "diagnostic_hints",
+        hl = {
+            fg = "aqua",
+        },
+    }
+
+    component.diagnostic_info = {
+        provider = "diagnostic_info",
+    }
+
+    component.lsp = {
+        provider = function()
+            if not rawget(vim, "lsp") then
+                return ""
+            end
+
+            local progress = vim.lsp.util.get_progress_messages()[1]
+            if vim.o.columns < 120 then
+                return ""
+            end
+
+            local clients = vim.lsp.get_active_clients({ bufnr = 0 })
+            if #clients ~= 0 then
+                if progress then
+                    local spinners = {
+                        "◜ ",
+                        "◠ ",
+                        "◝ ",
+                        "◞ ",
+                        "◡ ",
+                        "◟ ",
+                    }
+                    local ms = vim.loop.hrtime() / 1000000
+                    local frame = math.floor(ms / 120) % #spinners
+                    local content = string.format("%%<%s", spinners[frame + 1])
+                    return content or ""
+                else
+                    return "לּ LSP"
+                end
+            end
+            return ""
+        end,
+        hl = function()
+            local progress = vim.lsp.util.get_progress_messages()[1]
+            return {
+                fg = progress and "yellow" or "green",
+                bg = "gray",
+                style = "bold",
+            }
+        end,
+        left_sep = "",
+        right_sep = "block",
+    }
+
+    component.file_type = {
+        provider = {
+            name = "file_type",
+            opts = {
+                filetype_icon = true,
+            },
+        },
+        hl = {
+            fg = "fg",
+            bg = "gray",
+        },
+        left_sep = "block",
+        right_sep = "block",
+    }
+
+    component.scroll_bar = {
+        provider = function()
+            local chars = {
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+            }
+            local line_ratio = vim.api.nvim_win_get_cursor(0)[1] / vim.api.nvim_buf_line_count(0)
+            local position = math.floor(line_ratio * 100)
+
+            if position <= 5 then
+                position = " TOP"
+            elseif position >= 95 then
+                position = " BOT"
+            else
+                position = chars[math.floor(line_ratio * #chars)] .. position
+            end
+            return position
+        end,
+        hl = function()
+            local position = math.floor(vim.api.nvim_win_get_cursor(0)[1] / vim.api.nvim_buf_line_count(0) * 100)
+            local fg
+            local style
+
+            if position <= 5 then
+                fg = "aqua"
+                style = "bold"
+            elseif position >= 95 then
+                fg = "red"
+                style = "bold"
+            else
+                fg = "purple"
+                style = nil
+            end
+            return {
+                fg = fg,
+                style = "bold",
+                bg = "bg",
+            }
+        end,
+        left_sep = "block",
+        right_sep = "block",
+    }
+
+    local left = {}
+    local middle = {}
+    local right = {
+        component.vim_mode,
+        component.file_type,
+        component.lsp,
+        component.git_branch,
+        component.git_add,
+        component.git_delete,
+        component.git_change,
+        component.separator,
+        component.diagnostic_errors,
+        component.diagnostic_warnings,
+        component.diagnostic_info,
+        component.diagnostic_hints,
+        component.scroll_bar,
+    }
+
+    local components = {
+        active = {
+            left,
+            middle,
+            right,
+        },
+    }
+
+    feline.setup({
+        components = components,
+        theme = theme,
+        vi_mode_colors = mode_theme,
+    })
+
+    ---vim:filetype=lua
+
+
+    --use {
+    --    'nvim-lualine/lualine.nvim',
+    --    requires = { 'kyazdani42/nvim-web-devicons', opt = true }
+    --}
 
     -- ^^ hopefully theming
 
@@ -170,46 +711,46 @@ return require('packer').startup(function(use)
         }
     }
 
-    require('lualine').setup {
-        options = {
-            icons_enabled = true,
-            theme = 'auto',
-            component_separators = { },
-            section_separators = { },
-            disabled_filetypes = {
-                statusline = {},
-                winbar = {},
-            },
-            ignore_focus = {},
-            always_divide_middle = true,
-            globalstatus = false,
-            refresh = {
-                statusline = 1000,
-                tabline = 1000,
-                winbar = 1000,
-            }
-        },
-        sections = {
-            lualine_a = {'mode'},
-            lualine_b = {'branch', 'diff', 'diagnostics'},
-            lualine_c = {'filename'},
-            lualine_x = {'encoding', 'fileformat', 'filetype'},
-            lualine_y = {'progress'},
-            lualine_z = {'location'}
-        },
-        inactive_sections = {
-            lualine_a = {},
-            lualine_b = {},
-            lualine_c = {'filename'},
-            lualine_x = {'location'},
-            lualine_y = {},
-            lualine_z = {}
-        },
-        tabline = {},
-        winbar = {},
-        inactive_winbar = {},
-        extensions = {}
-    }
+    --require('lualine').setup {
+    --    options = {
+    --        icons_enabled = true,
+    --        theme = 'auto',
+    --        component_separators = { },
+    --        section_separators = { },
+    --        disabled_filetypes = {
+    --            statusline = {},
+    --            winbar = {},
+    --        },
+    --        ignore_focus = {},
+    --        always_divide_middle = true,
+    --        globalstatus = false,
+    --        refresh = {
+    --            statusline = 1000,
+    --            tabline = 1000,
+    --            winbar = 1000,
+    --        }
+    --    },
+    --    sections = {
+    --        lualine_a = {'mode'},
+    --        lualine_b = {'branch', 'diff', 'diagnostics'},
+    --        lualine_c = {'filename'},
+    --        lualine_x = {'encoding', 'fileformat', 'filetype'},
+    --        lualine_y = {'progress'},
+    --        lualine_z = {'location'}
+    --    },
+    --    inactive_sections = {
+    --        lualine_a = {},
+    --        lualine_b = {},
+    --        lualine_c = {'filename'},
+    --        lualine_x = {'location'},
+    --        lualine_y = {},
+    --        lualine_z = {}
+    --    },
+    --    tabline = {},
+    --    winbar = {},
+    --    inactive_winbar = {},
+    --    extensions = {}
+    --}
 
     require('nvim-ts-autotag').setup()
 
@@ -292,7 +833,7 @@ vim.opt.backup = false
 vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
 vim.opt.undofile = true
 
-vim.opt.hlsearch = false
+vim.opt.hlsearch = true 
 vim.opt.incsearch = true
 
 vim.opt.termguicolors = true
@@ -309,7 +850,7 @@ vim.opt.isfname:append("@-@")
 
 
 -- did this fix freezing ???
---vim.opt.updatetime = 50
+vim.opt.updatetime = 50
 
 
 
@@ -396,27 +937,68 @@ vim.diagnostic.config({
 
 -- colors.lua
 
---gruvbox material specifics
---vim.o.background = "dark"
---vim.g.gruvbox_material_background = "soft"
---vim.g.gruvbox_material_transparent_background = 2 
---autocmd ColorScheme * call v:lua.vim.lsp.diagnostic._define_default_signs_and_highlights()
---vim.cmd('colorscheme gruvbox-material')
-
-vim.o.background = "dark" -- or "light" for light mode
-require('gruvbox').setup({
-    italic = {false},
-    transparent_mode = true,
-    contrast = "soft",
+require('nightfox').setup({
+  options = {
+    -- Compiled file's destination location
+    compile_path = vim.fn.stdpath("cache") .. "/nightfox",
+    compile_file_suffix = "_compiled", -- Compiled file suffix
+    transparent = true,     -- Disable setting background
+    terminal_colors = true,  -- Set terminal colors (vim.g.terminal_color_*) used in `:terminal`
+    dim_inactive = false,    -- Non focused panes set to alternative background
+    module_default = true,   -- Default enable value for modules
+    colorblind = {
+      enable = false,        -- Enable colorblind support
+      simulate_only = false, -- Only show simulated colorblind colors and not diff shifted
+      severity = {
+        protan = 0,          -- Severity [0,1] for protan (red)
+        deutan = 0,          -- Severity [0,1] for deutan (green)
+        tritan = 0,          -- Severity [0,1] for tritan (blue)
+      },
+    },
+    styles = {               -- Style to be applied to different syntax groups
+      comments = "NONE",     -- Value is any valid attr-list value `:help attr-list`
+      conditionals = "NONE",
+      constants = "NONE",
+      functions = "NONE",
+      keywords = "NONE",
+      numbers = "NONE",
+      operators = "NONE",
+      strings = "NONE",
+      types = "NONE",
+      variables = "NONE",
+    },
+    inverse = {             -- Inverse highlight for different types
+      match_paren = false,
+      visual = false,
+      search = false,
+    },
+    modules = {             -- List of various plugins and additional options
+      -- ...
+    },
+  },
+  palettes = {},
+  specs = {},
+  groups = {},
 })
 
-vim.cmd([[colorscheme gruvbox]])
---vim.cmd([[colorscheme ayu]])
+-- setup must be called before loading
+vim.cmd("colorscheme terafox")
+
+--require("bluloco").setup({
+--  style = "dark",               -- "auto" | "dark" | "light"
+--  transparent = true,
+--  italics = false,
+--  terminal = vim.fn.has("gui_running") == 1, -- bluoco colors are enabled in gui terminals per default.
+--  guicursor = false,
+--})
+--
+--vim.cmd('colorscheme bluloco')
+
+--vim.cmd([[colorscheme gruvboxed]])
+--vim.cmd([[colorscheme noctis]])
 --vim.cmd([[colorscheme oxocarbon]])
---vim.cmd([[colorscheme dracula]])
---vim.cmd('colorscheme rose-pine')vim.cmd('colorscheme tokyonight')
--- vim.cmd('colorscheme moonfly')
---vim.cmd('colorscheme gruvbox')
+--vim.cmd('colorscheme rose-pine')
+--vim.cmd('colorscheme moonfly')
 --  :highlight SignColumn guibg=NONE
 vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
@@ -429,7 +1011,7 @@ vim.api.nvim_set_hl(0, "LineNr", { bg = "none" })
 -- fugitive.lua
 vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
 
-local JSpievak_Fugitive = vim.api.nvim_create_augroup("ThePrimeagen_Fugitive", {})
+local JSpievak_Fugitive = vim.api.nvim_create_augroup("JSpievak_Fugitive", {})
 
 local autocmd = vim.api.nvim_create_autocmd
 autocmd("BufWinEnter", {
