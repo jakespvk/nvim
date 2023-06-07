@@ -31,9 +31,6 @@ return require('packer').startup(function(use)
     -- git blame
     use ('f-person/git-blame.nvim')
 
-    -- git gutter
-    use ('airblade/vim-gitgutter')
-
     -- trouble
     use({
         "folke/trouble.nvim",
