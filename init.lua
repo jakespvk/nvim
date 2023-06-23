@@ -491,6 +491,10 @@ vim.keymap.set("v", "<leader>d", "\"_d")
 vim.keymap.set("i", "<C-c", "<Esc>")
 
 vim.keymap.set("n", "Q", "<nop>")
+-- unmap arrow keys for kinesis kb
+vim.keymap.set("x", "<Up>", "<nop>")
+vim.keymap.set("x", "<Down>", "<nop>")
+
 vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux_sessionizer<CR>")
 vim.keymap.set("n", "<leader>f", function()
     vim.lsp.buf.format()
