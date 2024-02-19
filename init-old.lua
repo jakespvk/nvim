@@ -1,45 +1,38 @@
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
-  vim.fn.system({
-    "git",
-    "clone",
-    "--filter=blob:none",
-    "https://github.com/folke/lazy.nvim.git",
-    "--branch=stable", -- latest stable release
-    lazypath,
-  })
-end
-vim.opt.rtp:prepend(lazypath)
+-- This file can be loaded by calling `lua require('plugins')` from your init.vim
 
-vim.g.mapleader = ' '
+-- Only required if you have packer configured as `opt`
+vim.cmd [[packadd packer.nvim]]
 
-require("lazy").setup({
+return require('packer').startup(function(use)
+    -- Packer can manage itself
+    use 'wbthomason/packer.nvim'
 
-    {
-        'nvim-telescope/telescope.nvim', version = '0.1.1',
+
+    use {
+        'nvim-telescope/telescope.nvim', tag = '0.1.1',
         -- or                            , branch = '0.1.x',
-        dependencies = { {'nvim-lua/plenary.nvim'} }
-    },
+        requires = { {'nvim-lua/plenary.nvim'} }
+    }
 
-    ('tjdevries/colorbuddy.nvim'),
-    ('folke/lsp-colors.nvim'),
+    use ('tjdevries/colorbuddy.nvim')
+    use ('folke/lsp-colors.nvim')
     -- theme
-    --'tomasiser/vim-code-dark',
-    --"EdenEast/nightfox.nvim" -- Packer,
-    ('ellisonleao/gruvbox.nvim'),
+    --use 'tomasiser/vim-code-dark'
+    --use "EdenEast/nightfox.nvim" -- Packer
+    use ('ellisonleao/gruvbox.nvim')
 
-    ('nvim-treesitter/nvim-treesitter'), --{build = ':TSUpdate'}),
-    ('nvim-treesitter/nvim-treesitter-context'),
-    ('nvim-treesitter/playground'),
+    use ('nvim-treesitter/nvim-treesitter', {run = ':TSUpdate'})
+    use ('nvim-treesitter/nvim-treesitter-context')
+    use ('nvim-treesitter/playground')
 
     -- autotag
-    --('windwp/nvim-ts-autotag'),
+    --use ('windwp/nvim-ts-autotag')
 
     -- git blame
-    ('f-person/git-blame.nvim'),
+    use ('f-person/git-blame.nvim')
 
     -- trouble
-    ({
+    use({
         "folke/trouble.nvim",
         config = function()
             require("trouble").setup {
@@ -49,24 +42,24 @@ require("lazy").setup({
                 -- refer to the configuration section below
             }
         end
-    }),
+    })
 
-    {
+    use {
     "ThePrimeagen/harpoon",
     branch = "harpoon2",
-    dependencies = { {"nvim-lua/plenary.nvim"} }
-    },
-    ('mbbill/undotree'),
-    ('tpope/vim-fugitive'),
-    ('muniftanjim/prettier.nvim'),
-    ('folke/neodev.nvim'),
-    ('theprimeagen/vim-be-good'),
+    requires = { {"nvim-lua/plenary.nvim"} }
+    }
+    use ('mbbill/undotree')
+    use ('tpope/vim-fugitive')
+    use ('muniftanjim/prettier.nvim')
+    use ('folke/neodev.nvim')
+    use ('theprimeagen/vim-be-good')
 
     -- todo comments
     -- Lua
-    {
+    use {
         "folke/todo-comments.nvim",
-        dependencies = "nvim-lua/plenary.nvim",
+        requires = "nvim-lua/plenary.nvim",
         config = function()
             require("todo-comments").setup {
                 -- your configuration comes here
@@ -137,29 +130,265 @@ require("lazy").setup({
 
             }
         end
-    },
+    }
 
     -- theming below
-    'kyazdani42/nvim-web-devicons',
-    {
+    vim.opt.termguicolors = true
+    use 'kyazdani42/nvim-web-devicons'
+    use {
         'lewis6991/gitsigns.nvim',
         config = function()
             require('gitsigns').setup()
         end
-    },
+    }
+    use 'freddiehaddad/feline.nvim'
 
-    'nvim-lualine/lualine.nvim',
-    {
-        'nvim-lualine/lualine.nvim',
-        dependencies = { 'kyazdani42/nvim-web-devicons', lazy = false }
-    },
+    local line_ok, feline = pcall(require, "feline")
+    if not line_ok then
+        return
+    end
+
+    local one_monokai = {
+        fg = "#abb2bf",
+        bg = "#1e2024",
+        green = "#98c379",
+        yellow = "#e5c07b",
+        purple = "#c678dd",
+        orange = "#d19a66",
+        peanut = "#f6d5a4",
+        red = "#e06c75",
+        aqua = "#61afef",
+        darkblue = "#282c34",
+        dark_red = "#f75f5f",
+    }
+
+    local vi_mode_colors = {
+        NORMAL = "green",
+        OP = "green",
+        INSERT = "yellow",
+        VISUAL = "purple",
+        LINES = "orange",
+        BLOCK = "dark_red",
+        REPLACE = "red",
+        COMMAND = "aqua",
+    }
+
+    local c = {
+        vim_mode = {
+            provider = {
+                name = "vi_mode",
+                opts = {
+                    show_mode_name = true,
+                    -- padding = "center", -- Uncomment for extra padding.
+                },
+            },
+            hl = function()
+                return {
+                    fg = require("feline.providers.vi_mode").get_mode_color(),
+                    bg = "darkblue",
+                    style = "bold",
+                    name = "NeovimModeHLColor",
+                }
+            end,
+            left_sep = "block",
+            right_sep = "block",
+        },
+        gitBranch = {
+            provider = "git_branch",
+            hl = {
+                fg = "peanut",
+                bg = "darkblue",
+                style = "bold",
+            },
+            left_sep = "block",
+            right_sep = "block",
+        },
+        gitDiffAdded = {
+            provider = "git_diff_added",
+            hl = {
+                fg = "green",
+                bg = "darkblue",
+            },
+            left_sep = "block",
+            right_sep = "block",
+        },
+        gitDiffRemoved = {
+            provider = "git_diff_removed",
+            hl = {
+                fg = "red",
+                bg = "darkblue",
+            },
+            left_sep = "block",
+            right_sep = "block",
+        },
+        gitDiffChanged = {
+            provider = "git_diff_changed",
+            hl = {
+                fg = "fg",
+                bg = "darkblue",
+            },
+            left_sep = "block",
+            right_sep = "right_filled",
+        },
+        separator = {
+            provider = "",
+        },
+        fileinfo = {
+            provider = {
+                name = "file_info",
+                opts = {
+                    type = "relative-short",
+                },
+            },
+            hl = {
+                style = "bold",
+            },
+            left_sep = " ",
+            right_sep = " ",
+        },
+        diagnostic_errors = {
+            provider = "diagnostic_errors",
+            hl = {
+                fg = "red",
+            },
+        },
+        diagnostic_warnings = {
+            provider = "diagnostic_warnings",
+            hl = {
+                fg = "yellow",
+            },
+        },
+        diagnostic_hints = {
+            provider = "diagnostic_hints",
+            hl = {
+                fg = "aqua",
+            },
+        },
+        diagnostic_info = {
+            provider = "diagnostic_info",
+        },
+        lsp_client_names = {
+            provider = "lsp_client_names",
+            hl = {
+                fg = "purple",
+                bg = "darkblue",
+                style = "bold",
+            },
+            left_sep = "left_filled",
+            right_sep = "block",
+        },
+        file_type = {
+            provider = {
+                name = "file_type",
+                opts = {
+                    filetype_icon = true,
+                    case = "titlecase",
+                },
+            },
+            hl = {
+                fg = "red",
+                bg = "darkblue",
+                style = "bold",
+            },
+            left_sep = "block",
+            right_sep = "block",
+        },
+        file_encoding = {
+            provider = "file_encoding",
+            hl = {
+                fg = "orange",
+                bg = "darkblue",
+                style = "italic",
+            },
+            left_sep = "block",
+            right_sep = "block",
+        },
+        position = {
+            provider = "position",
+            hl = {
+                fg = "green",
+                bg = "darkblue",
+                style = "bold",
+            },
+            left_sep = "block",
+            right_sep = "block",
+        },
+        line_percentage = {
+            provider = "line_percentage",
+            hl = {
+                fg = "aqua",
+                bg = "darkblue",
+                style = "bold",
+            },
+            left_sep = "block",
+            right_sep = "block",
+        },
+        scroll_bar = {
+            provider = "scroll_bar",
+            hl = {
+                fg = "yellow",
+                style = "bold",
+            },
+        },
+    }
+
+    local left = {
+        c.vim_mode,
+        c.gitBranch,
+        c.gitDiffAdded,
+        c.gitDiffRemoved,
+        c.gitDiffChanged,
+        c.separator,
+    }
+
+    local middle = {
+        c.fileinfo,
+        c.diagnostic_errors,
+        c.diagnostic_warnings,
+        c.diagnostic_info,
+        c.diagnostic_hints,
+    }
+
+    local right = {
+        c.lsp_client_names,
+        c.file_type,
+        c.file_encoding,
+        c.position,
+        c.line_percentage,
+        c.scroll_bar,
+    }
+
+    local components = {
+        active = {
+            left,
+            middle,
+            right,
+        },
+        inactive = {
+            left,
+            middle,
+            right,
+        },
+    }
+
+    feline.setup({
+        components = components,
+        theme = one_monokai,
+    })
+        vi_mode_colors = vi_mode_colors,
+
+
+        --use {
+    --    'nvim-lualine/lualine.nvim',
+    --    requires = { 'kyazdani42/nvim-web-devicons', opt = true }
+    --}
 
     -- ^^ hopefully theming
 
-    {
+    use {
         'VonHeikemen/lsp-zero.nvim',
         branch = 'v1.x',
-        dependencies = {
+        requires = {
             -- LSP Support
             {'neovim/nvim-lspconfig'},             -- Required
             {'williamboman/mason.nvim'},           -- Optional
@@ -178,51 +407,50 @@ require("lazy").setup({
             {'L3MON4D3/LuaSnip'},             -- Required
             {'rafamadriz/friendly-snippets'}, -- Optional
         }
-    },
+    }
 
-    require('lualine').setup {
-        options = {
-            icons_enabled = true,
-            theme = 'auto',
-            component_separators = { },
-            section_separators = { },
-            disabled_filetypes = {
-                statusline = {},
-                winbar = {},
-            },
-            ignore_focus = {},
-            always_divide_middle = true,
-            globalstatus = false,
-            refresh = {
-                statusline = 1000,
-                tabline = 1000,
-                winbar = 1000,
-            }
-        },
-        sections = {
-            lualine_a = {'mode'},
-            lualine_b = {'branch', 'diff', 'diagnostics'},
-            lualine_c = {'filename'},
-            lualine_x = {'encoding', 'fileformat', 'filetype'},
-            lualine_y = {'progress'},
-            lualine_z = {'location'}
-        },
-        inactive_sections = {
-            lualine_a = {},
-            lualine_b = {},
-            lualine_c = {'filename'},
-            lualine_x = {'location'},
-            lualine_y = {},
-            lualine_z = {}
-        },
-        tabline = {},
-        winbar = {},
-        inactive_winbar = {},
-        extensions = {}
-    },
+    --require('lualine').setup {
+    --    options = {
+    --        icons_enabled = true,
+    --        theme = 'auto',
+    --        component_separators = { },
+    --        section_separators = { },
+    --        disabled_filetypes = {
+    --            statusline = {},
+    --            winbar = {},
+    --        },
+    --        ignore_focus = {},
+    --        always_divide_middle = true,
+    --        globalstatus = false,
+    --        refresh = {
+    --            statusline = 1000,
+    --            tabline = 1000,
+    --            winbar = 1000,
+    --        }
+    --    },
+    --    sections = {
+    --        lualine_a = {'mode'},
+    --        lualine_b = {'branch', 'diff', 'diagnostics'},
+    --        lualine_c = {'filename'},
+    --        lualine_x = {'encoding', 'fileformat', 'filetype'},
+    --        lualine_y = {'progress'},
+    --        lualine_z = {'location'}
+    --    },
+    --    inactive_sections = {
+    --        lualine_a = {},
+    --        lualine_b = {},
+    --        lualine_c = {'filename'},
+    --        lualine_x = {'location'},
+    --        lualine_y = {},
+    --        lualine_z = {}
+    --    },
+    --    tabline = {},
+    --    winbar = {},
+    --    inactive_winbar = {},
+    --    extensions = {}
+    --}
 
-    --require('nvim-ts-autotag').setup ()
-})
+    --require('nvim-ts-autotag').setup()
 
 -- netrw
 vim.g.netrw_browse_split = 0
@@ -230,6 +458,7 @@ vim.g.netrw_banner = 0
 vim.g.netrw_winsize = 25
 
 -- remap.lua
+vim.g.mapleader = ' '
 
 vim.keymap.set("n", "<leader>pv", ":Ex<CR>")
 vim.keymap.set("n", "<leader>u", ":UndotreeShow<CR>")
@@ -601,3 +830,6 @@ require'nvim-treesitter.configs'.setup {
 
 -- undotree
 vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
+
+end)
+
