@@ -12,13 +12,14 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 vim.g.mapleader = ' '
+vim.g.maplocalleader = ' '
 
 require("lazy").setup({
 
     {
-        'nvim-telescope/telescope.nvim', version = '0.1.1',
+        'nvim-telescope/telescope.nvim', version = '0.1.5',
         -- or                            , branch = '0.1.x',
-        dependencies = { {'nvim-lua/plenary.nvim'} }
+        dependencies = { 'nvim-lua/plenary.nvim' }
     },
 
     ('tjdevries/colorbuddy.nvim'),
@@ -27,6 +28,14 @@ require("lazy").setup({
     --'tomasiser/vim-code-dark',
     --"EdenEast/nightfox.nvim" -- Packer,
     ('ellisonleao/gruvbox.nvim'),
+    { "rose-pine/neovim", name = "rose-pine" },
+    {
+        "folke/tokyonight.nvim",
+        lazy = false,
+        priority = 1000,
+        opts = {},
+    },
+    { "EdenEast/nightfox.nvim" },
 
     ('nvim-treesitter/nvim-treesitter'), --{build = ':TSUpdate'}),
     ('nvim-treesitter/nvim-treesitter-context'),
@@ -157,13 +166,12 @@ require("lazy").setup({
 
     {
         'VonHeikemen/lsp-zero.nvim',
-        branch = 'v1.x',
+        branch = 'v3.x',
         dependencies = {
             -- LSP Support
             {'neovim/nvim-lspconfig'},             -- Required
             {'williamboman/mason.nvim'},           -- Optional
             {'williamboman/mason-lspconfig.nvim'}, -- Optional
-            {'glepnir/lspsaga.nvim'},
 
             -- Autocompletion
             {'hrsh7th/nvim-cmp'},         -- Required
@@ -174,54 +182,55 @@ require("lazy").setup({
             {'hrsh7th/cmp-nvim-lua'},     -- Optional
 
             -- Snippets
-            {'L3MON4D3/LuaSnip'},             -- Required
+            {'L3MON4D3/LuaSnip', version = "v2.x"},             -- Required
             {'rafamadriz/friendly-snippets'}, -- Optional
         }
     },
 
-    --require('lualine').setup {
-    --    options = {
-    --        icons_enabled = true,
-    --        theme = 'auto',
-    --        component_separators = { },
-    --        section_separators = { },
-    --        disabled_filetypes = {
-    --            statusline = {},
-    --            winbar = {},
-    --        },
-    --        ignore_focus = {},
-    --        always_divide_middle = true,
-    --        globalstatus = false,
-    --        refresh = {
-    --            statusline = 1000,
-    --            tabline = 1000,
-    --            winbar = 1000,
-    --        }
-    --    },
-    --    sections = {
-    --        lualine_a = {'mode'},
-    --        lualine_b = {'branch', 'diff', 'diagnostics'},
-    --        lualine_c = {'filename'},
-    --        lualine_x = {'encoding', 'fileformat', 'filetype'},
-    --        lualine_y = {'progress'},
-    --        lualine_z = {'location'}
-    --    },
-    --    inactive_sections = {
-    --        lualine_a = {},
-    --        lualine_b = {},
-    --        lualine_c = {'filename'},
-    --        lualine_x = {'location'},
-    --        lualine_y = {},
-    --        lualine_z = {}
-    --    },
-    --    tabline = {},
-    --    winbar = {},
-    --    inactive_winbar = {},
-    --    extensions = {}
-    --},
 
     --require('nvim-ts-autotag').setup ()
 })
+
+require('lualine').setup {
+    options = {
+        icons_enabled = true,
+        theme = 'auto',
+        component_separators = { },
+        section_separators = { },
+        disabled_filetypes = {
+            statusline = {},
+            winbar = {},
+        },
+        ignore_focus = {},
+        always_divide_middle = true,
+        globalstatus = false,
+        refresh = {
+            statusline = 1000,
+            tabline = 1000,
+            winbar = 1000,
+        }
+    },
+    sections = {
+        lualine_a = {'mode'},
+        lualine_b = {'branch', 'diff', 'diagnostics'},
+        lualine_c = { {'filename', path=3} },
+        lualine_x = {'encoding', 'fileformat', 'filetype'},
+        lualine_y = {'progress'},
+        lualine_z = {'location'}
+    },
+    inactive_sections = {
+        lualine_a = {},
+        lualine_b = {},
+        lualine_c = {'filename'},
+        lualine_x = {'location'},
+        lualine_y = {},
+        lualine_z = {}
+    },
+    tabline = {},
+    winbar = {},
+    inactive_winbar = {},
+    extensions = {}
+}
 
 -- netrw
 vim.g.netrw_browse_split = 0
@@ -323,7 +332,7 @@ vim.opt.isfname:append("@-@")
 
 
 -- did this fix freezing ???
-vim.opt.updatetime = 50
+--vim.opt.updatetime = 50
 
 
 
@@ -342,124 +351,81 @@ vim.opt.colorcolumn = "80"
 vim.g.mapleader = " "
 
 -- lsp
-local lsp = require("lsp-zero")
+local lsp_zero = require('lsp-zero')
 
-lsp.preset("recommended")
+lsp_zero.on_attach(function(client, bufnr)
+  local opts = {buffer = bufnr, remap = false}
 
-lsp.ensure_installed({
-    'html',
-    'tsserver',
-	'eslint',
-	'rust_analyzer',
-})
+  vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
+  vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)
+  vim.keymap.set("n", "<leader>vws", function() vim.lsp.buf.workspace_symbol() end, opts)
+  vim.keymap.set("n", "<leader>vd", function() vim.diagnostic.open_float() end, opts)
+  vim.keymap.set("n", "[d", function() vim.diagnostic.goto_next() end, opts)
+  vim.keymap.set("n", "]d", function() vim.diagnostic.goto_prev() end, opts)
+  vim.keymap.set("n", "<leader>vca", function() vim.lsp.buf.code_action() end, opts)
+  vim.keymap.set("n", "<leader>rr", function() vim.lsp.buf.references() end, opts)
+  vim.keymap.set("n", "<leader>rn", function() vim.lsp.buf.rename() end, opts)
+  vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
+end)
 
--- Fix Undefined global 'vim'
-lsp.configure('lua-language-server', {
-    settings = {
-        Lua = {
-            diagnostics = {
-                globals = { 'vim' }
-            }
-        }
-    }
+-- to learn how to use mason.nvim with lsp-zero
+-- read this: https://github.com/VonHeikemen/lsp-zero.nvim/blob/v3.x/doc/md/guides/integrate-with-mason-nvim.md
+require('mason').setup({})
+require('mason-lspconfig').setup({
+  ensure_installed = {'tsserver', 'rust_analyzer'},
+  handlers = {
+    lsp_zero.default_setup,
+    lua_ls = function()
+      local lua_opts = lsp_zero.nvim_lua_ls()
+      require('lspconfig').lua_ls.setup(lua_opts)
+    end,
+  }
 })
 
 local cmp = require('cmp')
 local cmp_select = {behavior = cmp.SelectBehavior.Select}
-local cmp_mappings = lsp.defaults.cmp_mappings({
-	['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
-	['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
-	['<C-y>'] = cmp.mapping.confirm({ select = true }),
-	['<C-Space>'] = cmp.mapping.complete(),
+
+-- this is the function that loads the extra snippets to luasnip
+-- from rafamadriz/friendly-snippets
+require('luasnip.loaders.from_vscode').lazy_load()
+
+cmp.setup({
+  sources = {
+    {name = 'path'},
+    {name = 'nvim_lsp'},
+    {name = 'nvim_lua'},
+    {name = 'luasnip', keyword_length = 2},
+    {name = 'buffer', keyword_length = 3},
+  },
+  formatting = lsp_zero.cmp_format(),
+  mapping = cmp.mapping.preset.insert({
+    ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
+    ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
+    ['<C-y>'] = cmp.mapping.confirm({ select = true }),
+    ['<C-Space>'] = cmp.mapping.complete(),
+  }),
 })
-
-lsp.set_preferences({
-	sign_icons = {
-        error = 'E',
-        warn = 'W',
-        hint = 'H',
-        info = 'I'
-    }
-})
-
-lsp.setup_nvim_cmp({
-	mapping = cmp_mappings
-})
-
-lsp.on_attach(function(client, bufnr)
-	local opts = {buffer = bufnr, remap = false}
-
-	vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
-	vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)
-	vim.keymap.set("n", "<leader>vws", function() vim.lsp.buf.workspace_symbol() end, opts)
-	vim.keymap.set("n", "<leader>vd", function() vim.lsp.diagnostic.open_float() end, opts)
-	vim.keymap.set("n", "[d", function() vim.diagnostic.goto_next() end, opts)
-	vim.keymap.set("n", "]d", function() vim.diagnostic.goto_prev() end, opts)
-	vim.keymap.set("n", "<leader>vca", function() vim.lsp.buf.code_action() end, opts)
-	vim.keymap.set("n", "<leader>vrr", function() vim.lsp.buf.references() end, opts)
-	vim.keymap.set("n", "<leader>vrn", function() vim.lsp.buf.rename() end, opts)
-	vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
-
-end)
-
-lsp.setup()
 
 vim.diagnostic.config({
     virtual_text = true
 })
 
 -- colors.lua
-
---require('nightfox').setup({
---  options = {
---    -- Compiled file's destination location
---    compile_path = vim.fn.stdpath("cache") .. "/nightfox",
---    compile_file_suffix = "_compiled", -- Compiled file suffix
---    transparent = true,     -- Disable setting background
---    terminal_colors = true,  -- Set terminal colors (vim.g.terminal_color_*) used in `:terminal`
---    dim_inactive = false,    -- Non focused panes set to alternative background
---    module_default = true,   -- Default enable value for modules
---    colorblind = {
---      enable = false,        -- Enable colorblind support
---      simulate_only = false, -- Only show simulated colorblind colors and not diff shifted
---      severity = {
---        protan = 0,          -- Severity [0,1] for protan (red)
---        deutan = 0,          -- Severity [0,1] for deutan (green)
---        tritan = 0,          -- Severity [0,1] for tritan (blue)
---      },
---    },
---    styles = {               -- Style to be applied to different syntax groups
---      comments = "NONE",     -- Value is any valid attr-list value `:help attr-list`
---      conditionals = "NONE",
---      constants = "NONE",
---      functions = "NONE",
---      keywords = "NONE",
---      numbers = "NONE",
---      operators = "NONE",
---      strings = "NONE",
---      types = "NONE",
---      variables = "NONE",
---    },
---    inverse = {             -- Inverse highlight for different types
---      match_paren = false,
---      visual = false,
---      search = false,
---    },
---    modules = {             -- List of various plugins and additional options
---      -- ...
---    },
---  },
---  palettes = {},
---  specs = {},
---  groups = {},
---})
-
--- setup must be called before loading
---vim.cmd("colorscheme codedark")
-
 vim.o.background = "dark"
--- setup must be called before loading the colorscheme
--- Default options:
+
+require('nightfox').setup({
+  options = {
+    transparent = true,     -- Disable setting background
+    terminal_colors = true,  -- Set terminal colors (vim.g.terminal_color_*) used in `:terminal`
+  },
+})
+require("rose-pine").setup({
+    styles = {
+        bold = false,
+        --italic = false,
+        transparency = true,
+    },
+})
 require("gruvbox").setup({
   undercurl = true,
   underline = true,
@@ -481,7 +447,16 @@ require("gruvbox").setup({
   dim_inactive = false,
   transparent_mode = true,
 })
-vim.cmd("colorscheme gruvbox")
+require("tokyonight").setup({
+    transparent = true,
+})
+--vim.cmd("colorscheme carbonfox")
+vim.cmd("colorscheme terafox")
+--vim.cmd("colorscheme nightfox")
+--vim.cmd("colorscheme rose-pine")
+--vim.cmd("colorscheme gruvbox")
+--vim.cmd("colorscheme tokyonight")
+
 --  :highlight SignColumn guibg=NONE
 --vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 --vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
@@ -578,24 +553,14 @@ require 'nvim-treesitter.install'.prefer_git = false
 
 require'nvim-treesitter.configs'.setup {
   -- A list of parser names, or "all" (the five listed parsers should always be installed)
-  ensure_installed = { "javascript", "lua", "c", "vim", "query" },
+  ensure_installed = { "javascript", "lua", "c", "vim", "query", "html" },
 
   -- Install parsers synchronously (only applied to `ensure_installed`)
   sync_install = false,
 
-  -- Automatically install missing parsers when entering buffer
-  -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
-  auto_install = true,
+  highlight = { enable = true, },
+  indent = { enable = true, }
 
-  highlight = {
-    enable = true,
-
-    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-    -- Using this option may slow down your editor, and you may see some duplicate highlights.
-    -- Instead of true it can also be a list of languages
-    additional_vim_regex_highlighting = false,
-  },
 }
 
 -- undotree
