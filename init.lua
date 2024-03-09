@@ -451,11 +451,11 @@ require("tokyonight").setup({
     transparent = true,
 })
 --vim.cmd("colorscheme carbonfox")
-vim.cmd("colorscheme terafox")
+--vim.cmd("colorscheme terafox")
 --vim.cmd("colorscheme nightfox")
 --vim.cmd("colorscheme rose-pine")
 --vim.cmd("colorscheme gruvbox")
---vim.cmd("colorscheme tokyonight")
+vim.cmd("colorscheme tokyonight")
 
 --  :highlight SignColumn guibg=NONE
 --vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
