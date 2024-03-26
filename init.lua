@@ -307,7 +307,7 @@ vim.opt.expandtab = true
 vim.opt.smartindent = true
 
 -- word wrap
-vim.opt.wrap = false
+vim.opt.wrap = true
 
 vim.opt.swapfile = false
 vim.opt.backup = false
@@ -332,7 +332,7 @@ vim.opt.isfname:append("@-@")
 
 
 -- did this fix freezing ???
---vim.opt.updatetime = 50
+vim.opt.updatetime = 50
 
 
 
@@ -372,7 +372,7 @@ end)
 -- read this: https://github.com/VonHeikemen/lsp-zero.nvim/blob/v3.x/doc/md/guides/integrate-with-mason-nvim.md
 require('mason').setup({})
 require('mason-lspconfig').setup({
-  ensure_installed = {'tsserver', 'rust_analyzer'},
+  ensure_installed = {'quick_lint_js', 'rust_analyzer', 'pyright', 'cssls'},
   handlers = {
     lsp_zero.default_setup,
     lua_ls = function()
@@ -553,7 +553,7 @@ require 'nvim-treesitter.install'.prefer_git = false
 
 require'nvim-treesitter.configs'.setup {
   -- A list of parser names, or "all" (the five listed parsers should always be installed)
-  ensure_installed = { "javascript", "lua", "c", "vim", "query", "html" },
+  ensure_installed = { "javascript", "lua", "c", "vim", "query", "html", "python" },
 
   -- Install parsers synchronously (only applied to `ensure_installed`)
   sync_install = false,
@@ -565,3 +565,6 @@ require'nvim-treesitter.configs'.setup {
 
 -- undotree
 vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
+
+-- quick-lint-js
+require('lspconfig').quick_lint_js.setup {}
