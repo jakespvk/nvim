@@ -195,8 +195,8 @@ require('lualine').setup {
     options = {
         icons_enabled = true,
         theme = 'auto',
-        component_separators = { },
-        section_separators = { },
+        component_separators = {},
+        section_separators = { left = '', right = '' },
         disabled_filetypes = {
             statusline = {},
             winbar = {},
@@ -211,12 +211,12 @@ require('lualine').setup {
         }
     },
     sections = {
-        lualine_a = {'mode'},
+        lualine_a = { { 'mode', separator = { left = '' }, right_padding = 2 } },
         lualine_b = {'branch', 'diff', 'diagnostics'},
         lualine_c = { {'filename', path=3} },
         lualine_x = {'encoding', 'fileformat', 'filetype'},
         lualine_y = {'progress'},
-        lualine_z = {'location'}
+        lualine_z = { { 'location', separator = { right = '' }, left_padding = 2 }, },
     },
     inactive_sections = {
         lualine_a = {},
@@ -307,7 +307,7 @@ vim.opt.expandtab = true
 vim.opt.smartindent = true
 
 -- word wrap
-vim.opt.wrap = true
+vim.opt.wrap = false
 
 vim.opt.swapfile = false
 vim.opt.backup = false
@@ -372,7 +372,7 @@ end)
 -- read this: https://github.com/VonHeikemen/lsp-zero.nvim/blob/v3.x/doc/md/guides/integrate-with-mason-nvim.md
 require('mason').setup({})
 require('mason-lspconfig').setup({
-  ensure_installed = {'quick_lint_js', 'rust_analyzer', 'pyright', 'cssls'},
+  ensure_installed = {'quick_lint_js', 'rust_analyzer', 'cssls', 'eslint', 'html'},
   handlers = {
     lsp_zero.default_setup,
     lua_ls = function()
@@ -381,6 +381,11 @@ require('mason-lspconfig').setup({
     end,
   }
 })
+-- quick-lint-js
+require('lspconfig').quick_lint_js.setup {}
+require('lspconfig').ruff_lsp.setup {}
+require('lspconfig').eslint.setup {}
+require('lspconfig').html.setup {}
 
 local cmp = require('cmp')
 local cmp_select = {behavior = cmp.SelectBehavior.Select}
@@ -420,9 +425,10 @@ require('nightfox').setup({
   },
 })
 require("rose-pine").setup({
+    variant = 'moon',
     styles = {
-        bold = false,
-        --italic = false,
+        bold = true,
+        italic = false,
         transparency = true,
     },
 })
@@ -449,13 +455,17 @@ require("gruvbox").setup({
 })
 require("tokyonight").setup({
     transparent = true,
+    styles = {
+        comments = { italic = false },
+        keywords = { italic = false },
+    },
 })
---vim.cmd("colorscheme carbonfox")
 --vim.cmd("colorscheme terafox")
 --vim.cmd("colorscheme nightfox")
---vim.cmd("colorscheme rose-pine")
+--vim.cmd("colorscheme carbonfox")
+vim.cmd("colorscheme rose-pine")
 --vim.cmd("colorscheme gruvbox")
-vim.cmd("colorscheme tokyonight")
+--vim.cmd("colorscheme tokyonight")
 
 --  :highlight SignColumn guibg=NONE
 --vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
@@ -548,6 +558,12 @@ vim.keymap.set('n', '<leader>ps', function()
 
 end)
 
+-- temp theme switcher
+vim.keymap.set("n", "<leader>t", function()
+    local selected_theme = vim.fn.input("colorscheme(rose-pine, tokyonight, gruvbox, terafox, carbonfox, nightfox): ")
+    vim.cmd("colorscheme " .. selected_theme)
+end)
+
 -- treesitter
 require 'nvim-treesitter.install'.prefer_git = false
 
@@ -566,5 +582,4 @@ require'nvim-treesitter.configs'.setup {
 -- undotree
 vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
 
--- quick-lint-js
-require('lspconfig').quick_lint_js.setup {}
+
