@@ -187,6 +187,8 @@ require("lazy").setup({
         }
     },
 
+    { 'j-hui/fidget.nvim', opts = {} },
+
 
     --require('nvim-ts-autotag').setup ()
 })
@@ -216,7 +218,7 @@ require('lualine').setup {
         lualine_c = { {'filename', path=3} },
         lualine_x = {'encoding', 'fileformat', 'filetype'},
         lualine_y = {'progress'},
-        lualine_z = { { 'location', separator = { right = '' }, left_padding = 2 }, },
+        lualine_z = { { 'location', separator = { right = '' }, left_padding = 2 } },
     },
     inactive_sections = {
         lualine_a = {},
@@ -308,6 +310,7 @@ vim.opt.smartindent = true
 
 -- word wrap
 vim.opt.wrap = false
+vim.opt.smoothscroll = true
 
 vim.opt.swapfile = false
 vim.opt.backup = false
@@ -324,15 +327,50 @@ vim.opt.scrolloff = 8
 vim.opt.signcolumn = "yes"
 vim.opt.isfname:append("@-@")
 
+-- SOME COPYPASTAS FROM KICKSTART I FOUND INTRIGUING
 
+-- Highlight when yanking (copying) text
+--  Try it with `yap` in normal mode
+--  See `:help vim.highlight.on_yank()`
+vim.api.nvim_create_autocmd('TextYankPost', {
+  desc = 'Highlight when yanking (copying) text',
+  group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
+  callback = function()
+    vim.highlight.on_yank()
+  end,
+})
 
+-- Sets how neovim will display certain whitespace characters in the editor.
+--  See `:help 'list'`
+--  and `:help 'listchars'`
+vim.opt.list = true
+vim.opt.listchars = { tab = '» ', nbsp = '␣' }
 
+-- Show which line your cursor is on
+--vim.opt.cursorline = true
+
+-- Preview substitutions live, as you type!
+vim.opt.inccommand = 'split'
+
+-- Set highlight on search, but clear on pressing <Esc> in normal mode
+vim.opt.hlsearch = true
+vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+
+-- Enable break indent
+vim.opt.breakindent = true
 
 
 
 
 -- did this fix freezing ???
-vim.opt.updatetime = 50
+vim.opt.updatetime = 250
+
+
+
+
+-- Decrease mapped sequence wait time
+-- Displays which-key popup sooner
+vim.opt.timeoutlen = 300
 
 
 
@@ -342,11 +380,7 @@ vim.opt.updatetime = 50
 
 
 
-
-
-
-
-vim.opt.colorcolumn = "80"
+--vim.opt.colorcolumn = "80"
 
 vim.g.mapleader = " "
 
@@ -516,7 +550,7 @@ local harpoon = require("harpoon")
 harpoon:setup()
 -- REQUIRED
 
-vim.keymap.set("n", "<leader>a", function() harpoon:list():append() end)
+vim.keymap.set("n", "<leader>a", function() harpoon:list():add() end)
 vim.keymap.set("n", "<C-e>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
 
 vim.keymap.set("n", "<C-h>", function() harpoon:list():select(1) end)
