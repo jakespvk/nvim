@@ -43,7 +43,10 @@ require("lazy").setup({
     ('nvim-treesitter/playground'),
 
     -- autotag
-    --('windwp/nvim-ts-autotag'),
+    ('windwp/nvim-ts-autotag'),
+
+    -- supermaven
+    --"supermaven-inc/supermaven-nvim",
 
     -- centerpad
     ('smithbm2316/centerpad.nvim'),
@@ -173,28 +176,26 @@ require("lazy").setup({
         branch = 'v3.x',
         dependencies = {
             -- LSP Support
-            { 'neovim/nvim-lspconfig' },           -- Required
-            { 'williamboman/mason.nvim' },         -- Optional
+            { 'neovim/nvim-lspconfig' },             -- Required
+            { 'williamboman/mason.nvim' },           -- Optional
             { 'williamboman/mason-lspconfig.nvim' }, -- Optional
 
             -- Autocompletion
-            { 'hrsh7th/nvim-cmp' },       -- Required
-            { 'hrsh7th/cmp-nvim-lsp' },   -- Required
-            { 'hrsh7th/cmp-buffer' },     -- Optional
-            { 'hrsh7th/cmp-path' },       -- Optional
+            { 'hrsh7th/nvim-cmp' },         -- Required
+            { 'hrsh7th/cmp-nvim-lsp' },     -- Required
+            { 'hrsh7th/cmp-buffer' },       -- Optional
+            { 'hrsh7th/cmp-path' },         -- Optional
             { 'saadparwaiz1/cmp_luasnip' }, -- Optional
-            { 'hrsh7th/cmp-nvim-lua' },   -- Optional
+            { 'hrsh7th/cmp-nvim-lua' },     -- Optional
 
             -- Snippets
             { 'L3MON4D3/LuaSnip',                 version = "v2.x" }, -- Required
-            { 'rafamadriz/friendly-snippets' },     -- Optional
+            { 'rafamadriz/friendly-snippets' },                       -- Optional
         }
     },
 
     { 'j-hui/fidget.nvim', opts = {} },
 
-
-    --require('nvim-ts-autotag').setup ()
 })
 
 require('lualine').setup {
@@ -202,7 +203,8 @@ require('lualine').setup {
         icons_enabled = true,
         theme = 'auto',
         component_separators = {},
-        section_separators = { left = '', right = '' },
+        --section_separators = { left = '', right = '' },
+        section_separators = { left = '', right = '' },
         disabled_filetypes = {
             statusline = {},
             winbar = {},
@@ -217,13 +219,13 @@ require('lualine').setup {
         }
     },
     sections = {
-        lualine_a = { { 'mode', separator = { left = '' }, right_padding = 2 } },
+        lualine_a = { { 'mode' } }, -- , separator = { left = '' }, right_padding = 2 } },
         lualine_b = { 'branch', 'diff', 'diagnostics' },
         lualine_c = { { 'filename', path = 3 } },
         lualine_x = { 'encoding', 'fileformat', 'filetype' },
         lualine_y = { 'progress' },
         lualine_z = {
-            { 'location', separator = { right = '' }, left_padding = 2 },
+            { 'location' }, --separator = { right = '' }, left_padding = 2 },
         },
     },
     inactive_sections = {
@@ -246,17 +248,17 @@ vim.g.netrw_banner = 0
 vim.g.netrw_winsize = 25
 
 -- vim options (remove auto comment)
-vim.api.nvim_create_autocmd("FileType", {
-    pattern = "*",
-    callback = function()
-        vim.opt_local.formatoptions:remove({ 'r', 'o' })
-    end,
-})
+--vim.api.nvim_create_autocmd("FileType", {
+--    pattern = "*",
+--    callback = function()
+--        vim.opt_local.formatoptions:remove({ 'r', 'o' })
+--    end,
+--})
 
 -- remap.lua
 
 vim.keymap.set("n", "<leader>pv", ":Ex<CR>")
-vim.keymap.set("n", "<leader>u", ":UndotreeShow<CR>")
+--vim.keymap.set("n", "<leader>u", ":UndotreeShow<CR>")
 
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
@@ -324,7 +326,7 @@ vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
 vim.opt.undofile = true
 
 -- highlight all search
-vim.opt.hlsearch = false
+--vim.opt.hlsearch = false
 vim.opt.incsearch = true
 
 vim.opt.termguicolors = true
@@ -412,7 +414,7 @@ end)
 -- read this: https://github.com/VonHeikemen/lsp-zero.nvim/blob/v3.x/doc/md/guides/integrate-with-mason-nvim.md
 require('mason').setup({})
 require('mason-lspconfig').setup({
-    ensure_installed = { 'quick_lint_js', 'rust_analyzer', 'cssls', 'eslint', 'html' },
+    ensure_installed = { 'quick_lint_js', 'rust_analyzer', 'eslint' },
     handlers = {
         lsp_zero.default_setup,
         lua_ls = function()
@@ -425,7 +427,31 @@ require('mason-lspconfig').setup({
 require('lspconfig').quick_lint_js.setup {}
 require('lspconfig').ruff_lsp.setup {}
 require('lspconfig').eslint.setup {}
-require('lspconfig').html.setup {}
+require('lspconfig').emmet_language_server.setup({
+  filetypes = { "css", "eruby", "html", "javascript", "javascriptreact", "less", "sass", "scss", "pug", "typescriptreact" },
+  -- Read more about this options in the [vscode docs](https://code.visualstudio.com/docs/editor/emmet#_emmet-configuration).
+  -- **Note:** only the options listed in the table are supported.
+  init_options = {
+    ---@type table<string, string>
+    includeLanguages = {},
+    --- @type string[]
+    excludeLanguages = {},
+    --- @type string[]
+    extensionsPath = {},
+    --- @type table<string, any> [Emmet Docs](https://docs.emmet.io/customization/preferences/)
+    preferences = {},
+    --- @type boolean Defaults to `true`
+    showAbbreviationSuggestions = true,
+    --- @type "always" | "never" Defaults to `"always"`
+    showExpandedAbbreviation = "always",
+    --- @type boolean Defaults to `false`
+    showSuggestionsAsSnippets = false,
+    --- @type table<string, any> [Emmet Docs](https://docs.emmet.io/customization/syntax-profiles/)
+    syntaxProfiles = {},
+    --- @type table<string, string> [Emmet Docs](https://docs.emmet.io/customization/snippets/#variables)
+    variables = {},
+  },
+})
 
 local cmp = require('cmp')
 local cmp_select = { behavior = cmp.SelectBehavior.Select }
@@ -460,7 +486,7 @@ vim.o.background = "dark"
 
 require('nightfox').setup({
     options = {
-        transparent = true, -- Disable setting background
+        transparent = true,     -- Disable setting background
         terminal_colors = true, -- Set terminal colors (vim.g.terminal_color_*) used in `:terminal`
     },
 })
@@ -486,7 +512,7 @@ require("gruvbox").setup({
     invert_signs = false,
     invert_tabline = false,
     invert_intend_guides = false,
-    inverse = true,  -- invert background for search, diffs, statuslines and errors
+    inverse = true,    -- invert background for search, diffs, statuslines and errors
     contrast = "soft", -- can be "hard", "soft" or empty string
     palette_overrides = {},
     overrides = {},
@@ -508,12 +534,12 @@ vim.cmd("colorscheme rose-pine")
 --vim.cmd("colorscheme tokyonight")
 
 --  :highlight SignColumn guibg=NONE
---vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
---vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
---vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
---vim.api.nvim_set_hl(0, "LineNr", { bg = "none" })
---vim.api.nvim_set_hl(0, "DiagnosticSignWarn", { bg = "none", fg = "yellow" })
---vim.api.nvim_set_hl(0, "DiagnosticSignError", { bg = "none", fg = "red" })
+vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
+vim.api.nvim_set_hl(0, "LineNr", { bg = "none" })
+vim.api.nvim_set_hl(0, "DiagnosticSignWarn", { bg = "none", fg = "yellow" })
+vim.api.nvim_set_hl(0, "DiagnosticSignError", { bg = "none", fg = "red" })
 -- :highlight SignColumn guibg=NONE
 
 -- fugitive.lua
@@ -568,26 +594,33 @@ vim.keymap.set("n", "<C-s>", function() harpoon:list():select(4) end)
 vim.keymap.set("n", "<C-S-P>", function() harpoon:list():prev() end)
 vim.keymap.set("n", "<C-S-N>", function() harpoon:list():next() end)
 
+require('telescope').setup{
+    defaults = {
+        file_ignore_patterns = {
+            "node_modules"
+        }
+    }
+}
 -- basic telescope configuration
---local conf = require("telescope.config").values
---local function toggle_telescope(harpoon_files)
---    local file_paths = {}
---    for _, item in ipairs(harpoon_files.items) do
---        table.insert(file_paths, item.value)
---    end
---
---    require("telescope.pickers").new({}, {
---        prompt_title = "Harpoon",
---        finder = require("telescope.finders").new_table({
---            results = file_paths,
---        }),
---        previewer = conf.file_previewer({}),
---        sorter = conf.generic_sorter({}),
---    }):find()
---end
---
---vim.keymap.set("n", "<C-e>", function() toggle_telescope(harpoon:list()) end,
---    { desc = "Open harpoon window" })
+local conf = require("telescope.config").values
+local function toggle_telescope(harpoon_files)
+    local file_paths = {}
+    for _, item in ipairs(harpoon_files.items) do
+        table.insert(file_paths, item.value)
+    end
+
+    require("telescope.pickers").new({}, {
+        prompt_title = "Harpoon",
+        finder = require("telescope.finders").new_table({
+            results = file_paths,
+        }),
+        previewer = conf.file_previewer({}),
+        sorter = conf.generic_sorter({}),
+    }):find()
+end
+
+vim.keymap.set("n", "<C-e>", function() toggle_telescope(harpoon:list()) end,
+    { desc = "Open harpoon window" })
 
 -- telescope
 local builtin = require('telescope.builtin')
@@ -598,10 +631,10 @@ vim.keymap.set('n', '<leader>ps', function()
 end)
 
 -- temp theme switcher
-vim.keymap.set("n", "<leader>t", function()
-    local selected_theme = vim.fn.input("colorscheme(rose-pine, tokyonight, gruvbox, terafox, carbonfox, nightfox): ")
-    vim.cmd("colorscheme " .. selected_theme)
-end)
+--vim.keymap.set("n", "<leader>t", function()
+--    local selected_theme = vim.fn.input("colorscheme(rose-pine, tokyonight, gruvbox, terafox, carbonfox, nightfox): ")
+--    vim.cmd("colorscheme " .. selected_theme)
+--end)
 
 -- treesitter
 require 'nvim-treesitter.install'.prefer_git = false
@@ -614,7 +647,8 @@ require 'nvim-treesitter.configs'.setup {
     sync_install = false,
 
     highlight = { enable = true, },
-    indent = { enable = true, }
+    indent = { enable = true, },
+    autotag = { enable = true, },
 
 }
 
@@ -622,5 +656,19 @@ require 'nvim-treesitter.configs'.setup {
 vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
 
 -- centerpad
-vim.api.nvim_set_keymap('n', '<leader>z', "<cmd>lua require'centerpad'.toggle{ leftpad = 60, rightpad = 60 }<cr>",
-    { silent = true, noremap = true })
+--vim.api.nvim_set_keymap('n', '<leader>z', "<cmd>lua require'centerpad'.toggle{ leftpad = 60, rightpad = 60 }<cr>",
+--    { silent = true, noremap = true })
+
+-- supermaven
+--require("supermaven-nvim").setup({
+--  keymaps = {
+--    accept_suggestion = "<Tab>",
+--    clear_suggestion = "<C-]>",
+--    accept_word = "<C-j>",
+--  },
+--  ignore_filetypes = { cpp = true },
+--  color = {
+--    suggestion_color = "#404040",
+--    cterm = 244,
+--  }
+--})
