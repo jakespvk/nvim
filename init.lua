@@ -18,8 +18,7 @@ require("lazy").setup({
 
     {
         'nvim-telescope/telescope.nvim',
-        version = '0.1.5',
-        -- or                            , branch = '0.1.x',
+        branch = '0.1.x',
         dependencies = { 'nvim-lua/plenary.nvim' }
     },
 
@@ -29,18 +28,42 @@ require("lazy").setup({
     --'tomasiser/vim-code-dark',
     --"EdenEast/nightfox.nvim" -- Packer,
     ('ellisonleao/gruvbox.nvim'),
-    { "rose-pine/neovim",      name = "rose-pine" },
+    { "rose-pine/neovim",  name = "rose-pine" },
     {
-        "folke/tokyonight.nvim",
-        lazy = false,
-        priority = 1000,
-        opts = {},
+        'sainnhe/gruvbox-material',
+
+        config = function()
+            --vim.g.gruvbox_material_better_performance = 1
+            ---- Fonts
+            --vim.g.gruvbox_material_disable_italic_comment = 1
+            --vim.g.gruvbox_material_enable_italic = 0
+            --vim.g.gruvbox_material_enable_bold = 0
+            --vim.g.gruvbox_material_transparent_background = 1
+            ---- Themes
+            --vim.g.gruvbox_material_foreground = 'mix'
+            --vim.g.gruvbox_material_background = 'hard'
+            --vim.g.gruvbox_material_ui_contrast = 'high' -- The contrast of line numbers, indent lines, etc.
+            --vim.g.gruvbox_material_float_style = 'dim'  -- Background of floating windows
+            vim.g.gruvbox_material_diagnostic_virtual_text = 'colored'
+        end
     },
-    { "EdenEast/nightfox.nvim" },
 
     ('nvim-treesitter/nvim-treesitter'), --{build = ':TSUpdate'}),
     ('nvim-treesitter/nvim-treesitter-context'),
     ('nvim-treesitter/playground'),
+
+    {
+        'razak17/tailwind-fold.nvim',
+        opts= {
+            enabled = true,
+            symbol = "×",
+            highlight = {
+                fg = "#38BDF8",
+            },
+            ft = { 'html', 'svelte', 'astro', 'vue', 'typescriptreact', 'javascriptreact' },
+        },
+        dependencies = { 'nvim-treesitter/nvim-treesitter' },
+    },
 
     -- autotag
     ('windwp/nvim-ts-autotag'),
@@ -173,7 +196,7 @@ require("lazy").setup({
 
     {
         'VonHeikemen/lsp-zero.nvim',
-        branch = 'v3.x',
+        branch = 'v4.x',
         dependencies = {
             -- LSP Support
             { 'neovim/nvim-lspconfig' },             -- Required
@@ -248,12 +271,12 @@ vim.g.netrw_banner = 0
 vim.g.netrw_winsize = 25
 
 -- vim options (remove auto comment)
---vim.api.nvim_create_autocmd("FileType", {
---    pattern = "*",
---    callback = function()
---        vim.opt_local.formatoptions:remove({ 'r', 'o' })
---    end,
---})
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "*",
+    callback = function()
+        vim.opt_local.formatoptions:remove({ 'r', 'o' })
+    end,
+})
 
 -- remap.lua
 
@@ -285,13 +308,13 @@ vim.keymap.set("v", "<leader>d", "\"_d")
 vim.keymap.set("i", "<C-c>", "<Esc>")
 
 -- unmap arrow keys for kinesis kb
-vim.keymap.set("x", "<Up>", "<nop>")
-vim.keymap.set("x", "<Down>", "<nop>")
+vim.keymap.set("i", "<Up>", "<nop>")
+vim.keymap.set("i", "<Down>", "<nop>")
 
 vim.keymap.set("n", "Q", "<nop>")
 vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux_sessionizer<CR>")
 vim.keymap.set("n", "<leader>f", function()
-    vim.lsp.buf.format()
+    vim.lsp.buf.format({ async = false })
 end)
 
 vim.keymap.set("n", "<C-k>", "<cmd>cnext<CR>zz")
@@ -367,54 +390,45 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Enable break indent
 vim.opt.breakindent = true
 
-
-
-
 -- did this fix freezing ???
 vim.opt.updatetime = 250
-
-
-
 
 -- Decrease mapped sequence wait time
 -- Displays which-key popup sooner
 vim.opt.timeoutlen = 300
 
-
-
-
-
-
-
-
-
 --vim.opt.colorcolumn = "80"
-
-vim.g.mapleader = " "
 
 -- lsp
 local lsp_zero = require('lsp-zero')
 
-lsp_zero.on_attach(function(client, bufnr)
-    local opts = { buffer = bufnr, remap = false }
+local lsp_attach = function(client, bufnr)
+    lsp_zero.default_keymaps({ buffer = bufnr })
+end
 
-    vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
-    vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)
-    vim.keymap.set("n", "<leader>vws", function() vim.lsp.buf.workspace_symbol() end, opts)
-    vim.keymap.set("n", "<leader>vd", function() vim.diagnostic.open_float() end, opts)
-    vim.keymap.set("n", "[d", function() vim.diagnostic.goto_next() end, opts)
-    vim.keymap.set("n", "]d", function() vim.diagnostic.goto_prev() end, opts)
-    vim.keymap.set("n", "<leader>vca", function() vim.lsp.buf.code_action() end, opts)
-    vim.keymap.set("n", "<leader>rr", function() vim.lsp.buf.references() end, opts)
-    vim.keymap.set("n", "<leader>rn", function() vim.lsp.buf.rename() end, opts)
-    vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
-end)
+lsp_zero.extend_lspconfig({
+    capabilities = require('cmp_nvim_lsp').default_capabilities(),
+    lsp_attach = lsp_attach,
+    float_border = 'rounded',
+    sign_text = true,
+    vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = 0 }),
+    vim.keymap.set("n", "K", vim.lsp.buf.hover, { buffer = 0 }),
+    vim.keymap.set("n", "<leader>vws", vim.lsp.buf.workspace_symbol, { buffer = 0 }),
+    vim.keymap.set("n", "<leader>vd", vim.diagnostic.open_float, { buffer = 0 }),
+    vim.keymap.set("n", "<leader>pd", "<cmd>Telescope diagnostics<cr>", { buffer = 0 }),
+    vim.keymap.set("n", "[d", vim.diagnostic.goto_next, { buffer = 0 }),
+    vim.keymap.set("n", "]d", vim.diagnostic.goto_prev, { buffer = 0 }),
+    vim.keymap.set("n", "<leader>vca", vim.lsp.buf.code_action, { buffer = 0 }),
+    vim.keymap.set("n", "<leader>rr", vim.lsp.buf.references, { buffer = 0 }),
+    vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { buffer = 0 }),
+    vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, { buffer = 0 }),
+})
 
 -- to learn how to use mason.nvim with lsp-zero
 -- read this: https://github.com/VonHeikemen/lsp-zero.nvim/blob/v3.x/doc/md/guides/integrate-with-mason-nvim.md
 require('mason').setup({})
 require('mason-lspconfig').setup({
-    ensure_installed = { 'quick_lint_js', 'rust_analyzer', 'eslint' },
+    ensure_installed = { 'rust_analyzer' },
     handlers = {
         lsp_zero.default_setup,
         lua_ls = function()
@@ -423,34 +437,43 @@ require('mason-lspconfig').setup({
         end,
     }
 })
--- quick-lint-js
-require('lspconfig').quick_lint_js.setup {}
-require('lspconfig').ruff_lsp.setup {}
-require('lspconfig').eslint.setup {}
-require('lspconfig').emmet_language_server.setup({
-  filetypes = { "css", "eruby", "html", "javascript", "javascriptreact", "less", "sass", "scss", "pug", "typescriptreact" },
-  -- Read more about this options in the [vscode docs](https://code.visualstudio.com/docs/editor/emmet#_emmet-configuration).
-  -- **Note:** only the options listed in the table are supported.
-  init_options = {
-    ---@type table<string, string>
-    includeLanguages = {},
-    --- @type string[]
-    excludeLanguages = {},
-    --- @type string[]
-    extensionsPath = {},
-    --- @type table<string, any> [Emmet Docs](https://docs.emmet.io/customization/preferences/)
-    preferences = {},
-    --- @type boolean Defaults to `true`
-    showAbbreviationSuggestions = true,
-    --- @type "always" | "never" Defaults to `"always"`
-    showExpandedAbbreviation = "always",
-    --- @type boolean Defaults to `false`
-    showSuggestionsAsSnippets = false,
-    --- @type table<string, any> [Emmet Docs](https://docs.emmet.io/customization/syntax-profiles/)
-    syntaxProfiles = {},
-    --- @type table<string, string> [Emmet Docs](https://docs.emmet.io/customization/snippets/#variables)
-    variables = {},
-  },
+-- go / lsp config
+local lspconfig = require("lspconfig")
+lspconfig.gopls.setup({
+    settings = {
+        gopls = {
+            analyses = {
+                unusedparams = true,
+            },
+            staticcheck = true,
+            gofumpt = true,
+        },
+    },
+})
+lspconfig.emmet_ls.setup({
+    filetypes = { "css", "eruby", "html", "javascript", "javascriptreact", "less", "sass", "scss", "pug", "typescriptreact" },
+    -- Read more about this options in the [vscode docs](https://code.visualstudio.com/docs/editor/emmet#_emmet-configuration).
+    -- **Note:** only the options listed in the table are supported.
+    init_options = {
+        ---@type table<string, string>
+        includeLanguages = {},
+        --- @type string[]
+        excludeLanguages = {},
+        --- @type string[]
+        extensionsPath = {},
+        --- @type table<string, any> [Emmet Docs](https://docs.emmet.io/customization/preferences/)
+        preferences = {},
+        --- @type boolean Defaults to `true`
+        showAbbreviationSuggestions = true,
+        --- @type "always" | "never" Defaults to `"always"`
+        showExpandedAbbreviation = "always",
+        --- @type boolean Defaults to `false`
+        showSuggestionsAsSnippets = false,
+        --- @type table<string, any> [Emmet Docs](https://docs.emmet.io/customization/syntax-profiles/)
+        syntaxProfiles = {},
+        --- @type table<string, string> [Emmet Docs](https://docs.emmet.io/customization/snippets/#variables)
+        variables = {},
+    },
 })
 
 local cmp = require('cmp')
@@ -478,18 +501,12 @@ cmp.setup({
 })
 
 vim.diagnostic.config({
-    virtual_text = true
+    virtual_text = { enable = true, bg = "none", fg = "red" }
 })
 
 -- colors.lua
 vim.o.background = "dark"
 
-require('nightfox').setup({
-    options = {
-        transparent = true,     -- Disable setting background
-        terminal_colors = true, -- Set terminal colors (vim.g.terminal_color_*) used in `:terminal`
-    },
-})
 require("rose-pine").setup({
     variant = 'moon',
     styles = {
@@ -519,19 +536,9 @@ require("gruvbox").setup({
     dim_inactive = false,
     transparent_mode = true,
 })
-require("tokyonight").setup({
-    transparent = true,
-    styles = {
-        comments = { italic = false },
-        keywords = { italic = false },
-    },
-})
---vim.cmd("colorscheme terafox")
---vim.cmd("colorscheme nightfox")
---vim.cmd("colorscheme carbonfox")
-vim.cmd("colorscheme rose-pine")
+--vim.cmd("colorscheme rose-pine")
 --vim.cmd("colorscheme gruvbox")
---vim.cmd("colorscheme tokyonight")
+vim.cmd("colorscheme gruvbox-material")
 
 --  :highlight SignColumn guibg=NONE
 vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
@@ -540,6 +547,7 @@ vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
 vim.api.nvim_set_hl(0, "LineNr", { bg = "none" })
 vim.api.nvim_set_hl(0, "DiagnosticSignWarn", { bg = "none", fg = "yellow" })
 vim.api.nvim_set_hl(0, "DiagnosticSignError", { bg = "none", fg = "red" })
+vim.api.nvim_set_hl(0, "VirtualText", { bg = "none", fg = "red" })
 -- :highlight SignColumn guibg=NONE
 
 -- fugitive.lua
@@ -594,7 +602,7 @@ vim.keymap.set("n", "<C-s>", function() harpoon:list():select(4) end)
 vim.keymap.set("n", "<C-S-P>", function() harpoon:list():prev() end)
 vim.keymap.set("n", "<C-S-N>", function() harpoon:list():next() end)
 
-require('telescope').setup{
+require('telescope').setup {
     defaults = {
         file_ignore_patterns = {
             "node_modules"
@@ -647,7 +655,7 @@ require 'nvim-treesitter.configs'.setup {
     sync_install = false,
 
     highlight = { enable = true, },
-    indent = { enable = true, },
+    indent = { enable = false, },
     autotag = { enable = true, },
 
 }
@@ -655,20 +663,5 @@ require 'nvim-treesitter.configs'.setup {
 -- undotree
 vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
 
--- centerpad
---vim.api.nvim_set_keymap('n', '<leader>z', "<cmd>lua require'centerpad'.toggle{ leftpad = 60, rightpad = 60 }<cr>",
---    { silent = true, noremap = true })
-
--- supermaven
---require("supermaven-nvim").setup({
---  keymaps = {
---    accept_suggestion = "<Tab>",
---    clear_suggestion = "<C-]>",
---    accept_word = "<C-j>",
---  },
---  ignore_filetypes = { cpp = true },
---  color = {
---    suggestion_color = "#404040",
---    cterm = 244,
---  }
---})
+-- tailwind fold
+vim.opt.conceallevel = 2
