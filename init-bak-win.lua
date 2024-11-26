@@ -14,161 +14,47 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+-- for WSL2 
+vim.g.clipboard = {
+	name = 'WslClipboard',
+	copy = {
+		['+'] = 'clip.exe',
+		['*'] = 'clip.exe'
+	},
+	paste = {
+		['+'] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+		['*'] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))'
+	},
+	cache_enabled = 0,
+}
+
 require("lazy").setup({
 
     {
         'nvim-telescope/telescope.nvim',
-        tag = '0.1.8',
-        dependencies = {
-            'nvim-lua/plenary.nvim',
-            { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' }
-        }
+        version = '0.1.5',
+        -- or                            , branch = '0.1.x',
+        dependencies = { 'nvim-lua/plenary.nvim' }
     },
 
     ('tjdevries/colorbuddy.nvim'),
     ('folke/lsp-colors.nvim'),
     -- theme
-    --'tomasiser/vim-code-dark',
-    --"EdenEast/nightfox.nvim" -- Packer,
     ('ellisonleao/gruvbox.nvim'),
-    { "rose-pine/neovim",  name = "rose-pine" },
+    { "rose-pine/neovim",      name = "rose-pine" },
     {
         "folke/tokyonight.nvim",
         lazy = false,
         priority = 1000,
         opts = {},
     },
-    {
-        'sainnhe/gruvbox-material',
-
-        config = function()
-            vim.g.gruvbox_material_better_performance = 1
-            ---- Fonts
-            vim.g.gruvbox_material_disable_italic_comment = 1
-            vim.g.gruvbox_material_enable_italic = 0
-            vim.g.gruvbox_material_enable_bold = 0
-            vim.g.gruvbox_material_transparent_background = 1
-            ---- Themes
-            --vim.g.gruvbox_material_foreground = 'mix'
-            --vim.g.gruvbox_material_background = 'soft'
-            --vim.g.gruvbox_material_ui_contrast = 'high' -- The contrast of line numbers, indent lines, etc.
-            vim.g.gruvbox_material_float_style = 'dim' -- Background of floating windows
-            vim.g.gruvbox_material_diagnostic_virtual_text = 'colored'
-        end
-    },
 
     ('nvim-treesitter/nvim-treesitter'), --{build = ':TSUpdate'}),
     ('nvim-treesitter/nvim-treesitter-context'),
     ('nvim-treesitter/playground'),
 
-    {
-        'razak17/tailwind-fold.nvim',
-        opts = {
-            enabled = true,
-            symbol = "×",
-            highlight = {
-                fg = "#38BDF8",
-            },
-            ft = { 'html', 'svelte', 'astro', 'vue', 'typescriptreact', 'javascriptreact' },
-        },
-        dependencies = { 'nvim-treesitter/nvim-treesitter' },
-    },
-
     -- autotag
-    ('windwp/nvim-ts-autotag'),
-
-    {
-        'saghen/blink.cmp',
-        dependencies = 'rafamadriz/friendly-snippets',
-
-        version = 'v0.*',
-
-        opts = {
-            keymap = { preset = 'default' },
-
-            appearance = {
-                use_nvim_cmp_as_default = true,
-                nerd_font_variant = 'mono'
-            },
-
-            signature = { enabled = true }
-        },
-    },
-
-    {
-        "neovim/nvim-lspconfig",
-        dependencies = {
-            'saghen/blink.cmp',
-            ---@diagnostic disable-next-line: missing-fields
-            {
-                "folke/lazydev.nvim",
-                ft = "lua",
-                opts = {
-                    library = {
-                        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
-                    },
-                },
-            },
-        },
-        config = function()
-            local capabilities = require('blink.cmp').get_lsp_capabilities()
-            require("lspconfig").lua_ls.setup { capabilities = capabilities }
-            require("lspconfig").tailwindcss.setup { capabilities = capabilities }
-            require("lspconfig").ruff.setup { capabilities = capabilities }
-            require("lspconfig").emmet_language_server.setup { capabilities = capabilities }
-            require("lspconfig").zls.setup { capabilities = capabilities }
-            require("lspconfig").clangd.setup {
-                capabilities = capabilities,
-                cmd = {
-                    "clangd",
-                    "--fallback-style=webkit"
-                }
-            }
-            require("lspconfig").gopls.setup {
-                capabilities = capabilities,
-                settings = {
-                    gopls = {
-                        analyses = {
-                            unusedparams = true,
-                        },
-                        staticcheck = true,
-                    },
-                },
-            }
-            require("lspconfig").ts_ls.setup { capabilities = capabilities }
-
-            vim.api.nvim_create_autocmd('LspAttach', {
-                callback = function(args)
-                    local client = vim.lsp.get_client_by_id(args.data.client_id)
-                    if not client then return end
-
-                    vim.keymap.set("n", "<leader>vws", vim.lsp.buf.workspace_symbol)
-                    vim.keymap.set("n", "<leader>vd", vim.diagnostic.open_float)
-                    vim.keymap.set("n", "<leader>pd", "<cmd>Telescope diagnostics<cr>")
-                    vim.keymap.set("n", "[d", vim.diagnostic.goto_next)
-                    vim.keymap.set("n", "]d", vim.diagnostic.goto_prev)
-                    vim.keymap.set("n", "<leader>vca", vim.lsp.buf.code_action)
-                    vim.keymap.set("n", "<leader>rr", vim.lsp.buf.references)
-                    vim.keymap.set("n", "<leader>gd", vim.lsp.buf.implementation)
-                    vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename)
-                    vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help)
-
-                    if client:supports_method('textDocument/formatting') then
-                        -- Format the current buffer on save
-                        vim.api.nvim_create_autocmd('BufWritePre', {
-                            buffer = args.buf,
-                            callback = function()
-                                vim.lsp.buf.format({ bufnr = args.buf, id = client.id })
-                            end,
-                        })
-                    end
-                end,
-            })
-        end,
-    },
-
-    -- supermaven
-    "supermaven-inc/supermaven-nvim",
+    --('windwp/nvim-ts-autotag'),
 
     -- centerpad
     ('smithbm2316/centerpad.nvim'),
@@ -291,18 +177,73 @@ require("lazy").setup({
         dependencies = { 'kyazdani42/nvim-web-devicons' }
     },
 
+    -- ^^ hopefully theming
+
+    {
+        "seblj/roslyn.nvim",
+        ft = "cs",
+        opts = {
+            -- your configuration comes here; leave empty for default settings
+            config = {
+                settings = {
+                    ["csharp|inlay_hints"] = {
+                        csharp_enable_inlay_hints_for_implicit_object_creation = true,
+                        csharp_enable_inlay_hints_for_implicit_variable_types = true,
+                        csharp_enable_inlay_hints_for_lambda_parameter_types = true,
+                        csharp_enable_inlay_hints_for_types = true,
+                        dotnet_enable_inlay_hints_for_indexer_parameters = true,
+                        dotnet_enable_inlay_hints_for_literal_parameters = true,
+                        dotnet_enable_inlay_hints_for_object_creation_parameters = true,
+                        dotnet_enable_inlay_hints_for_other_parameters = true,
+                        dotnet_enable_inlay_hints_for_parameters = true,
+                        dotnet_suppress_inlay_hints_for_parameters_that_differ_only_by_suffix = true,
+                        dotnet_suppress_inlay_hints_for_parameters_that_match_argument_name = true,
+                        dotnet_suppress_inlay_hints_for_parameters_that_match_method_intent = true,
+                    },
+                    ["csharp|code_lens"] = {
+                        dotnet_enable_references_code_lens = true,
+                    },
+                }
+            }
+        }
+    },
+
+    {
+        'VonHeikemen/lsp-zero.nvim',
+        branch = 'v3.x',
+        dependencies = {
+            -- LSP Support
+            { 'neovim/nvim-lspconfig' },           -- Required
+            { 'williamboman/mason.nvim' },         -- Optional
+            { 'williamboman/mason-lspconfig.nvim' }, -- Optional
+
+            -- Autocompletion
+            { 'hrsh7th/nvim-cmp' },       -- Required
+            { 'hrsh7th/cmp-nvim-lsp' },   -- Required
+            { 'hrsh7th/cmp-buffer' },     -- Optional
+            { 'hrsh7th/cmp-path' },       -- Optional
+            { 'saadparwaiz1/cmp_luasnip' }, -- Optional
+            { 'hrsh7th/cmp-nvim-lua' },   -- Optional
+
+            -- Snippets
+            { 'L3MON4D3/LuaSnip',                 version = "v2.x" }, -- Required
+            { 'rafamadriz/friendly-snippets' },     -- Optional
+        }
+    },
+
     { 'j-hui/fidget.nvim', opts = {} },
 
+
+    --require('nvim-ts-autotag').setup ()
 })
 
 require('lualine').setup {
     options = {
         icons_enabled = true,
         theme = 'auto',
-        --component_separators = {},
-        component_separators = '',
-        section_separators = { left = '', right = '' },
-        --section_separators = { left = '', right = '' },
+        component_separators = {},
+        --section_separators = { left = '', right = '' },
+        section_separators = {},
         disabled_filetypes = {
             statusline = {},
             winbar = {},
@@ -317,13 +258,13 @@ require('lualine').setup {
         }
     },
     sections = {
-        lualine_a = { { 'mode', separator = { left = '' }, right_padding = 2 } },
+        lualine_a = { { 'mode' }, },-- { right_padding = 0, left_padding = 1 } }, -- , separator = { right = '' }, {right_padding = 0, left_padding = 0} } },
         lualine_b = { 'branch', 'diff', 'diagnostics' },
         lualine_c = { { 'filename', path = 3 } },
         lualine_x = { 'encoding', 'fileformat', 'filetype' },
         lualine_y = { 'progress' },
         lualine_z = {
-            { 'location', separator = { right = '' }, left_padding = 2 },
+            { 'location' }, --, separator = { right = '' }, left_padding = 2 },
         },
     },
     inactive_sections = {
@@ -355,9 +296,8 @@ vim.api.nvim_create_autocmd("FileType", {
 
 -- remap.lua
 
-vim.keymap.set("n", "<leader>pv", "<cmd>Ex<CR>")
-vim.keymap.set("n", "-", "<cmd>Ex<CR>")
---vim.keymap.set("n", "<leader>u", ":UndotreeShow<CR>")
+vim.keymap.set("n", "<leader>pv", ":Ex<CR>")
+vim.keymap.set("n", "<leader>u", ":UndotreeShow<CR>")
 
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
@@ -384,13 +324,13 @@ vim.keymap.set("v", "<leader>d", "\"_d")
 vim.keymap.set("i", "<C-c>", "<Esc>")
 
 -- unmap arrow keys for kinesis kb
-vim.keymap.set("i", "<Up>", "<nop>")
-vim.keymap.set("i", "<Down>", "<nop>")
+vim.keymap.set("x", "<Up>", "<nop>")
+vim.keymap.set("x", "<Down>", "<nop>")
 
 vim.keymap.set("n", "Q", "<nop>")
 vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux_sessionizer<CR>")
 vim.keymap.set("n", "<leader>f", function()
-    vim.lsp.buf.format({ async = false })
+    vim.lsp.buf.format()
 end)
 
 vim.keymap.set("n", "<C-k>", "<cmd>cnext<CR>zz")
@@ -398,14 +338,8 @@ vim.keymap.set("n", "<C-j>", "<cmd>cprev<CR>zz")
 vim.keymap.set("n", "<leader>k", "<cmd>lnext<CR>zz")
 vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz")
 
-vim.keymap.set("n", "<leader>s", ":%s/\\<C-r><C-w>\\>/<C-r><C-w>/gI<Left><Left><Left>")
+vim.keymap.set("n", "<leader>s", ":%s/\\<<C-r><C-w>\\>/<C-r><C-w>/gI<Left><Left><Left>")
 vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
-
-vim.keymap.set("n", "<leader>t", "<cmd>tabnew<CR><cmd>term<CR>a")
-vim.keymap.set("t", "<leader>t", "<C-\\><C-n>gt")
-vim.keymap.set("n", "<leader>vs", "<cmd>vsplit<CR>")
-vim.keymap.set("n", "<C-h>", "<C-w>h")
-vim.keymap.set("n", "<C-l>", "<C-w>l")
 
 -- set.lua
 
@@ -418,7 +352,7 @@ vim.opt.relativenumber = true
 vim.opt.tabstop = 4
 vim.opt.softtabstop = 4
 vim.opt.shiftwidth = 4
-vim.opt.expandtab = false
+vim.opt.expandtab = true
 
 vim.opt.smartindent = true
 
@@ -431,7 +365,7 @@ vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
 vim.opt.undofile = true
 
 -- highlight all search
---vim.opt.hlsearch = false
+vim.opt.hlsearch = false
 vim.opt.incsearch = true
 
 vim.opt.termguicolors = true
@@ -456,11 +390,11 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- Sets how neovim will display certain whitespace characters in the editor.
 --  See `:help 'list'`
 --  and `:help 'listchars'`
-vim.opt.list = true
-vim.opt.listchars = { tab = '» ', nbsp = '␣' }
+--vim.opt.list = true
+--vim.opt.listchars = { tab = '» ', nbsp = '␣' }
 
 -- Show which line your cursor is on
-vim.opt.cursorline = true
+--vim.opt.cursorline = true
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
@@ -472,42 +406,109 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Enable break indent
 vim.opt.breakindent = true
 
+
+
+
 -- did this fix freezing ???
 vim.opt.updatetime = 50
+
+
+
 
 -- Decrease mapped sequence wait time
 -- Displays which-key popup sooner
 vim.opt.timeoutlen = 300
 
-vim.opt.colorcolumn = "80"
+
+
+
+
+
+
+
+
+--vim.opt.colorcolumn = "80"
+
+vim.g.mapleader = " "
 
 -- lsp
+local lsp_zero = require('lsp-zero')
+
+lsp_zero.on_attach(function(client, bufnr)
+    local opts = { buffer = bufnr, remap = false }
+
+    vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
+    vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)
+    vim.keymap.set("n", "<leader>vws", function() vim.lsp.buf.workspace_symbol() end, opts)
+    vim.keymap.set("n", "<leader>vd", function() vim.diagnostic.open_float() end, opts)
+    vim.keymap.set("n", "[d", function() vim.diagnostic.goto_next() end, opts)
+    vim.keymap.set("n", "]d", function() vim.diagnostic.goto_prev() end, opts)
+    vim.keymap.set("n", "<leader>vca", function() vim.lsp.buf.code_action() end, opts)
+    vim.keymap.set("n", "<leader>rr", function() vim.lsp.buf.references() end, opts)
+    vim.keymap.set("n", "<leader>rn", function() vim.lsp.buf.rename() end, opts)
+    vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
+end)
+
+-- to learn how to use mason.nvim with lsp-zero
+-- read this: https://github.com/VonHeikemen/lsp-zero.nvim/blob/v3.x/doc/md/guides/integrate-with-mason-nvim.md
+require('mason').setup({})
+require('mason-lspconfig').setup({
+    ensure_installed = { 'cssls', 'html' },
+    handlers = {
+        lsp_zero.default_setup,
+        lua_ls = function()
+            local lua_opts = lsp_zero.nvim_lua_ls()
+            require('lspconfig').lua_ls.setup(lua_opts)
+        end,
+    }
+})
+--require('lspconfig').ruff_lsp.setup {}
+require('lspconfig').eslint.setup {}
+require('lspconfig').html.setup {}
+
+local cmp = require('cmp')
+local cmp_select = { behavior = cmp.SelectBehavior.Select }
+
+-- this is the function that loads the extra snippets to luasnip
+-- from rafamadriz/friendly-snippets
+require('luasnip.loaders.from_vscode').lazy_load()
+
+cmp.setup({
+    sources = {
+        { name = 'path' },
+        { name = 'nvim_lsp' },
+        { name = 'nvim_lua' },
+        { name = 'luasnip', keyword_length = 2 },
+        { name = 'buffer',  keyword_length = 3 },
+    },
+    formatting = lsp_zero.cmp_format(),
+    mapping = cmp.mapping.preset.insert({
+        ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
+        ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
+        ['<C-y>'] = cmp.mapping.confirm({ select = true }),
+        ['<C-Space>'] = cmp.mapping.complete(),
+    }),
+})
 
 vim.diagnostic.config({
-    virtual_text = { enable = true, bg = "none", fg = "red" }
+    virtual_text = true
 })
 
 -- colors.lua
 vim.o.background = "dark"
 
-
----@diagnostic disable-next-line: missing-fields
 require("rose-pine").setup({
     variant = 'moon',
-    extend_background_behind_borders = true,
     styles = {
         bold = true,
         italic = false,
         transparency = true,
     },
 })
-
----@diagnostic disable-next-line: missing-fields
 require("gruvbox").setup({
     undercurl = true,
     underline = true,
     bold = true,
-    ---@diagnostic disable-next-line: missing-fields
     italic = {
         strings = false,
         comments = false,
@@ -518,41 +519,23 @@ require("gruvbox").setup({
     invert_signs = false,
     invert_tabline = false,
     invert_intend_guides = false,
-    inverse = true,    -- invert background for search, diffs, statuslines and errors
-    contrast = "soft", -- can be "hard", "soft" or empty string
+    inverse = true,  -- invert background for search, diffs, statuslines and errors
+    contrast = "hard", -- can be "hard", "soft" or empty string
     palette_overrides = {},
     overrides = {},
     dim_inactive = false,
     transparent_mode = true,
 })
-
----@diagnostic disable-next-line: missing-fields
 require("tokyonight").setup({
-    style = "storm", -- The theme comes in three styles, `storm`, `moon`, and `night`.
-    transparent = false,
+    transparent = true,
     styles = {
-        keywords = { italic = false },
         comments = { italic = false },
+        keywords = { italic = false },
     },
 })
-
---vim.cmd("colorscheme rose-pine")
+vim.cmd("colorscheme rose-pine")
 --vim.cmd("colorscheme gruvbox")
---vim.cmd("colorscheme gruvbox-material")
-vim.cmd("colorscheme tokyonight")
-
---  :highlight SignColumn guibg=NONE
---vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
---vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
---vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
---vim.api.nvim_set_hl(0, "LineNr", { bg = "none", fg = "#757575" })
---vim.api.nvim_set_hl(0, "CursorLineNr", { bg = "none", fg = "#bf2a2a", bold = true })
---vim.api.nvim_set_hl(0, "CursorColumn", { bg = "none" })
-vim.api.nvim_set_hl(0, "CursorLine", { bg = "none" })
---vim.api.nvim_set_hl(0, "DiagnosticSignWarn", { bg = "none", fg = "yellow" })
---vim.api.nvim_set_hl(0, "DiagnosticSignError", { bg = "none", fg = "#bf2a2a" })
---vim.api.nvim_set_hl(0, "VirtualText", { bg = "none", fg = "red" })
--- :highlight SignColumn guibg=NONE
+--vim.cmd("colorscheme tokyonight")
 
 -- fugitive.lua
 vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
@@ -576,13 +559,12 @@ autocmd("BufWinEnter", {
 
         -- rebase always
         vim.keymap.set("n", "<leader>P", function()
-            vim.cmd.Git({ 'pull --rebase' })
+            vim.cmd.Git({ 'pull', '--rebase' })
         end, opts)
 
         -- NOTE: It allows me to easily set the branch i am pushing and any tracking
         -- needed if i did not set the branch up correctly
         vim.keymap.set("n", "<leader>t", ":Git push -u origin ", opts);
-        vim.keymap.set("n", "<leader>o", ":Git remote ", opts);
     end,
 })
 
@@ -598,65 +580,49 @@ harpoon:setup()
 vim.keymap.set("n", "<leader>a", function() harpoon:list():add() end)
 vim.keymap.set("n", "<C-e>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
 
-vim.keymap.set("n", "<C-n>", function() harpoon:list():select(1) end)
+vim.keymap.set("n", "<C-h>", function() harpoon:list():select(1) end)
 vim.keymap.set("n", "<C-t>", function() harpoon:list():select(2) end)
-vim.keymap.set("n", "<C-g>", function() harpoon:list():select(3) end)
+vim.keymap.set("n", "<C-n>", function() harpoon:list():select(3) end)
 vim.keymap.set("n", "<C-s>", function() harpoon:list():select(4) end)
 
 -- Toggle previous & next buffers stored within Harpoon list
 vim.keymap.set("n", "<C-S-P>", function() harpoon:list():prev() end)
 vim.keymap.set("n", "<C-S-N>", function() harpoon:list():next() end)
 
-require('telescope').setup {
-    defaults = {
-        file_ignore_patterns = {
-            "node_modules"
-        }
-    },
-    extension = {
-        fzf = {
-            fuzzy = true,
-            override_generic_sorter = true,
-            override_file_sorter = true,
-            case_mode = "smart_case",
-        }
-    }
-}
-require('telescope').load_extension('fzf')
 -- basic telescope configuration
-local conf = require("telescope.config").values
-local function toggle_telescope(harpoon_files)
-    local file_paths = {}
-    for _, item in ipairs(harpoon_files.items) do
-        table.insert(file_paths, item.value)
-    end
-
-    require("telescope.pickers").new({}, {
-        prompt_title = "Harpoon",
-        finder = require("telescope.finders").new_table({
-            results = file_paths,
-        }),
-        previewer = conf.file_previewer({}),
-        sorter = conf.generic_sorter({}),
-    }):find()
-end
-
-vim.keymap.set("n", "<C-e>", function() toggle_telescope(harpoon:list()) end,
-    { desc = "Open harpoon window" })
+--local conf = require("telescope.config").values
+--local function toggle_telescope(harpoon_files)
+--    local file_paths = {}
+--    for _, item in ipairs(harpoon_files.items) do
+--        table.insert(file_paths, item.value)
+--    end
+--
+--    require("telescope.pickers").new({}, {
+--        prompt_title = "Harpoon",
+--        finder = require("telescope.finders").new_table({
+--            results = file_paths,
+--        }),
+--        previewer = conf.file_previewer({}),
+--        sorter = conf.generic_sorter({}),
+--    }):find()
+--end
+--
+--vim.keymap.set("n", "<C-e>", function() toggle_telescope(harpoon:list()) end,
+--    { desc = "Open harpoon window" })
 
 -- telescope
 local builtin = require('telescope.builtin')
-vim.keymap.set('n', '<leader>pf', builtin.find_files)
-vim.keymap.set('n', '<C-p>', builtin.git_files)
+vim.keymap.set('n', '<leader>pf', builtin.find_files, {})
+vim.keymap.set('n', '<C-p>', builtin.git_files, {})
 vim.keymap.set('n', '<leader>ps', function()
     builtin.grep_string({ search = vim.fn.input("Grep > ") })
 end)
 
 -- temp theme switcher
---vim.keymap.set("n", "<leader>t", function()
---    local selected_theme = vim.fn.input("colorscheme(rose-pine, tokyonight, gruvbox, terafox, carbonfox, nightfox): ")
---    vim.cmd("colorscheme " .. selected_theme)
---end)
+vim.keymap.set("n", "<leader>t", function()
+    local selected_theme = vim.fn.input("colorscheme(rose-pine, tokyonight, gruvbox): ")
+    vim.cmd("colorscheme " .. selected_theme)
+end)
 
 -- treesitter
 require 'nvim-treesitter.install'.prefer_git = false
@@ -669,33 +635,22 @@ require 'nvim-treesitter.configs'.setup {
     sync_install = false,
 
     highlight = { enable = true, },
-    indent = { enable = false, },
-    autotag = { enable = true, },
+    indent = { enable = false, }
 
 }
 
 -- undotree
 vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
 
--- tailwind fold
-vim.opt.conceallevel = 2
+-- centerpad
+vim.api.nvim_set_keymap('n', '<leader>z', "<cmd>lua require'centerpad'.toggle{ leftpad = 60, rightpad = 60 }<cr>",
+    { silent = true, noremap = true })
 
--- supermaven
-require("supermaven-nvim").setup({
-    keymaps = {
-        accept_suggestion = "<Tab>",
-        clear_suggestion = "<C-]>",
-        accept_word = "<C-j>",
-    },
-    ignore_filetypes = { "cpp", "c", "go", "zig", "md", "git", "COMMIT_EDITMSG" },
-    color = {
-        suggestion_color = "#ffffff",
-        cterm = 244,
-    },
-    log_level = "info",                -- set to "off" to disable logging completely
-    disable_inline_completion = false, -- disables inline completion for use with cmp
-    disable_keymaps = false,           -- disables built in keymaps for more manual control
-    condition = function()
-        return false
-    end -- condition to check for stopping supermaven, `true` means to stop supermaven when the condition is true.
-})
+vim.keymap.set("n", "<leader>sv", ":vsplit<cr>")
+vim.keymap.set("n", "<leader>st", ":split<cr>")
+vim.keymap.set("n", "<leader>cs", ":close<cr>")
+
+vim.keymap.set("n", "<leader>sh", "<C-w>h")
+vim.keymap.set("n", "<leader>sj", "<C-w>j")
+vim.keymap.set("n", "<leader>sk", "<C-w>k")
+vim.keymap.set("n", "<leader>sl", "<C-w>l")
