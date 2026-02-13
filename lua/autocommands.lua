@@ -14,12 +14,13 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
     end,
 })
 
-vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
-    pattern = { "*.cs" },
-    callback = function()
-        vim.lsp.codelens.refresh({ bufnr = 0 })
-    end,
-})
+-- vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
+--     pattern = { "*.cs" },
+--     callback = function()
+--         vim.lsp.codelens.refresh({ bufnr = 0 })
+--         vim.lsp.codelens._refresh({ bufnr = 0 })
+--     end,
+-- })
 
 -- vim.api.nvim_create_autocmd({ "FileType" }, {
 --     pattern = { "fugitive" },

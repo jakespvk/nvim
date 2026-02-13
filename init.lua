@@ -18,6 +18,29 @@ vim.g.maplocalleader = ' '
 
 require("lazy").setup({
 
+    {
+        'nvim-treesitter/nvim-treesitter',
+        lazy = false,
+        build = ':TSUpdate'
+    },
+
+    {
+        "mason-org/mason.nvim",
+        opts = {}
+    },
+
+    {
+        'stevearc/oil.nvim',
+        ---@module 'oil'
+        ---@type oil.SetupOpts
+        opts = {},
+        -- Optional dependencies
+        -- dependencies = { { "nvim-mini/mini.icons", opts = {} } },
+        dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if you prefer nvim-web-devicons
+        -- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
+        lazy = false,
+    },
+
     { 'rcarriga/nvim-notify' },
 
     {
@@ -80,7 +103,7 @@ require("lazy").setup({
         ---@type RoslynNvimConfig
         opts = {
             -- your configuration comes here; leave empty for default settings
-            filewatching = "auto", -- "roslyn"
+            filewatching = "roslyn", -- "auto"
             choose_target = function(target)
                 return vim.iter(target):find(function(item)
                     if string.match(item, "OneInc.PolicyOne.All.sln") then
@@ -126,8 +149,6 @@ require("lazy").setup({
 
     { 'hardselius/warlock' },
 
-    { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' },
-
     -- {
     --     'razak17/tailwind-fold.nvim',
     --     lazy = true,
@@ -143,7 +164,16 @@ require("lazy").setup({
     -- },
 
     -- autotag
-    -- ('windwp/nvim-ts-autotag'),
+    ('windwp/nvim-ts-autotag'),
+
+    {
+        'windwp/nvim-autopairs',
+        event = "InsertEnter",
+        config = true,
+        -- use opts = {} for passing setup options
+        -- this is equivalent to setup({}) function
+        opts = {}
+    },
 
     {
         'saghen/blink.cmp',
@@ -234,11 +264,11 @@ require("lazy").setup({
                     vim.keymap.set("n", "<leader>vws", vim.lsp.buf.workspace_symbol)
                     vim.keymap.set("n", "<leader>vd", vim.diagnostic.open_float)
                     vim.keymap.set("n", "<leader>pd", "<cmd>Telescope diagnostics<cr>")
-                    vim.keymap.set("n", "[d", vim.diagnostic.goto_next)
-                    vim.keymap.set("n", "]d", vim.diagnostic.goto_prev)
+                    vim.keymap.set("n", "[d", vim.diagnostic.get_next)
+                    vim.keymap.set("n", "]d", vim.diagnostic.get_prev)
                     vim.keymap.set("n", "<leader>vca", vim.lsp.buf.code_action)
                     vim.keymap.set("n", "<leader>gr", vim.lsp.buf.references)
-                    vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition)
+                    vim.keymap.set("n", "gd", vim.lsp.buf.definition)
                     vim.keymap.set("n", "<leader>gi", vim.lsp.buf.implementation)
                     vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename)
                     vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help)
@@ -297,27 +327,11 @@ require("lazy").setup({
                     -- end
                 end,
             })
-
-            -- roslyn diagnostics refresh
-            vim.api.nvim_create_autocmd({ "InsertLeave" }, {
-                pattern = "*",
-                callback = function()
-                    local clients = vim.lsp.get_clients({ name = "roslyn" })
-                    if not clients or #clients == 0 then
-                        return
-                    end
-
-                    local buffers = vim.lsp.get_buffers_by_client_id(clients[1].id)
-                    for _, buf in ipairs(buffers) do
-                        vim.lsp.util._refresh("textDocument/diagnostic", { bufnr = buf })
-                    end
-                end,
-            })
         end,
     },
 
     -- supermaven
-    -- "supermaven-inc/supermaven-nvim",
+    "supermaven-inc/supermaven-nvim",
 
     -- git blame
     ('f-person/git-blame.nvim'),
@@ -464,8 +478,10 @@ vim.api.nvim_create_autocmd("FileType", {
 
 vim.keymap.set("n", "<leader>z", "<cmd>only<CR>")
 
-vim.keymap.set("n", "<leader>pv", "<cmd>Ex<CR>")
-vim.keymap.set("n", "-", "<cmd>Ex<CR>")
+-- vim.keymap.set("n", "<leader>pv", "<cmd>Ex<CR>")
+-- vim.keymap.set("n", "-", "<cmd>Ex<CR>")
+vim.keymap.set("n", "<leader>pv", "<cmd>Oil<CR>")
+vim.keymap.set("n", "-", "<cmd>Oil<CR>")
 
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
@@ -495,7 +511,7 @@ vim.keymap.set("i", "<C-c>", "<Esc>")
 -- vim.keymap.set("i", "<Up>", "<nop>")
 -- vim.keymap.set("i", "<Down>", "<nop>")
 
-vim.keymap.set("n", "Q", "<nop>")
+-- vim.keymap.set("n", "Q", "<nop>")
 vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux_sessionizer<CR>")
 vim.keymap.set("n", "<leader>f", function()
     vim.lsp.buf.format({ async = false })
@@ -552,7 +568,7 @@ vim.opt.wrap = false
 
 vim.opt.swapfile = false
 vim.opt.backup = false
-vim.opt.undodir = os.getenv("UserProfile") .. "/.vim/undodir" -- os.getenv("HOME") ..
+vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir" -- os.getenv("HOME") ..
 vim.opt.undofile = true
 
 -- highlight all search
@@ -562,6 +578,7 @@ vim.opt.incsearch = true
 vim.opt.termguicolors = true
 
 vim.opt.scrolloff = 8
+vim.opt.sidescrolloff = 20
 vim.opt.signcolumn = "yes"
 -- vim.opt.winborder = "rounded"
 vim.opt.isfname:append("@-@")
@@ -757,35 +774,38 @@ require('telescope').setup {
 -- basic telescope configuration
 
 -- telescope
+require('fzf-lua').setup({
+    "telescope",
+    -- your configuration comes here
+    -- or leave it empty to use the default settings
+    -- refer to the configuration section below
+    winopts = {
+        fullscreen = true,
+    },
+})
 local builtin = require('telescope.builtin')
 local fzf = require("fzf-lua")
 vim.keymap.set('n', '<leader>pf', fzf.files)
 vim.keymap.set('n', '<C-p>', fzf.git_files)
-vim.keymap.set('n', '<leader>ps', function()
-    fzf.live_grep({ search = vim.fn.input("Grep > ") })
-    -- builtin.grep_string({ search = vim.fn.input("Grep > ") })
-end)
+vim.keymap.set('n', '<leader>ps', fzf.live_grep)
+-- function()
+-- builtin.grep_string({ search = vim.fn.input("Grep > ") })
+-- end
 vim.keymap.set('n', '<leader>srr', builtin.lsp_references)
 vim.keymap.set('n', '<leader>jl', builtin.jumplist)
 
 -- treesitter
-require 'nvim-treesitter.install'.prefer_git = false
-require 'nvim-treesitter.install'.compilers = { "zig" }
+require 'nvim-treesitter'.setup {
+    -- Directory to install parsers and queries to (prepended to `runtimepath` to have priority)
+    install_dir = vim.fn.stdpath('data') .. '/site'
+}
+require('nvim-treesitter').install({ 'rust', 'javascript', 'zig', 'typescript', 'lua', 'c', 'vim', 'query', 'html',
+    'python', 'go', 'c_sharp', 'tsx' })
+-- require 'nvim-treesitter.install'.prefer_git = false
+-- require 'nvim-treesitter.install'.compilers = { "zig" }
 
 ---@diagnostic disable-next-line: missing-fields
-require 'nvim-treesitter.configs'.setup {
-    -- A list of parser names, or "all" (the five listed parsers should always be installed)
-    ensure_installed = { "typescript", "lua", "c", "vim", "query", "html", "python", "go", "zig", "c_sharp" },
-
-    -- Install parsers synchronously (only applied to `ensure_installed`)
-    sync_install = false,
-
-    highlight = { enable = true, },
-    indent = { enable = false, },
-    autotag = { enable = true, },
-
-    additional_vim_regex_highlighting = false,
-}
+-- require 'nvim-treesitter'.install { "typescript", "lua", "c", "vim", "query", "html", "python", "go", "zig", "c_sharp" }
 
 -- undotree
 vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
@@ -794,24 +814,24 @@ vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
 vim.opt.conceallevel = 0 -- 2 for tailwind fold
 
 -- supermaven
--- require("supermaven-nvim").setup({
---     keymaps = {
---         accept_suggestion = "<Tab>",
---         clear_suggestion = "<C-]>",
---         accept_word = "<C-j>",
---     },
---     ignore_filetypes = { "cpp", "c", "go", "zig", "markdown", "git", "COMMIT_EDITMSG", "cs", "text" },
---     color = {
---         suggestion_color = "#ffffff",
---         cterm = 244,
---     },
---     log_level = "info",                -- set to "off" to disable logging completely
---     disable_inline_completion = false, -- disables inline completion for use with cmp
---     disable_keymaps = false,           -- disables built in keymaps for more manual control
---     condition = function()
---         return false
---     end -- condition to check for stopping supermaven, `true` means to stop supermaven when the condition is true.
--- })
+require("supermaven-nvim").setup({
+    keymaps = {
+        accept_suggestion = "<Tab>",
+        clear_suggestion = "<C-]>",
+        accept_word = "<C-j>",
+    },
+    ignore_filetypes = { "cpp", "c", "go", "zig", "markdown", "git", "COMMIT_EDITMSG", "cs", "text" },
+    color = {
+        suggestion_color = "#ffffff",
+        cterm = 244,
+    },
+    log_level = "info",                -- set to "off" to disable logging completely
+    disable_inline_completion = false, -- disables inline completion for use with cmp
+    disable_keymaps = false,           -- disables built in keymaps for more manual control
+    condition = function()
+        return false
+    end -- condition to check for stopping supermaven, `true` means to stop supermaven when the condition is true.
+})
 
 
 ---
@@ -845,21 +865,23 @@ vim.opt.conceallevel = 0 -- 2 for tailwind fold
 --     cache_enabled = 0,
 -- }
 
-vim.filetype.add({
-    extension = { razor = 'razor' },
-})
+-- vim.filetype.add({
+--     extension = { razor = 'razor' },
+-- })
 
 
 --- LSP setup
 
 vim.lsp.config("roslyn", {
-    cmd = {
-        "dotnet",
-        "C:/Apps/Roslyn/Microsoft.CodeAnalysis.LanguageServer.dll",
-        "--logLevel=Information",
-        "--extensionLogDirectory=" .. vim.fs.dirname(vim.lsp.get_log_path()),
-        "--stdio",
-    },
+    -- cmd = {
+    --     "dotnet",
+    --     "C:/Apps/Roslyn/Microsoft.CodeAnalysis.LanguageServer.dll",
+    --     "--logLevel",
+    --     "Information",
+    --     "--extensionLogDirectory",
+    --     fs.joinpath(uv.os_tmpdir(), "roslyn_ls/logs"),
+    --     "--stdio",
+    -- },
     settings = {
         ["csharp|background_analysis"] = {
             dotnet_analyzer_diagnostics_scope = "openFiles", -- "openFiles", -- "fullSolution"
@@ -882,19 +904,55 @@ vim.lsp.config("roslyn", {
         },
     },
 })
-
--- vim.lsp.config("ts_ls", {
---     -- capabilities = capabilities,
--- })
---
--- vim.lsp.config("lua_ls", {})
--- vim.lsp.config("angularls", {})
--- vim.lsp.config("cucumber-language-server", {})
+vim.lsp.config("ts_ls", {})
+vim.lsp.config("lua_ls", {})
+vim.lsp.config("angularls", {})
+vim.lsp.config("cucumber-language-server", {})
 
 vim.lsp.enable({ "lua_ls", "ts_ls", "angularls", "cucumber_language_server" })
 
 -- vim.o.statusline = "%F %h%w%m%r%= %l:%c "
 vim.o.statusline = "%<%f %h%w%m%r%=%-4.(%l:%c%V%) %P"
+
+require("mason").setup({
+    registries = {
+        "github:mason-org/mason-registry",
+        "github:Crashdummyy/mason-registry",
+    },
+})
+
+require('nvim-ts-autotag').setup({
+    opts = {
+        -- Defaults
+        enable_close = true,          -- Auto close tags
+        enable_rename = true,         -- Auto rename pairs of tags
+        enable_close_on_slash = false -- Auto close on trailing </
+    },
+    -- Also override individual filetype configs, these take priority.
+    -- Empty by default, useful if one of the "opts" global settings
+    -- doesn't work well in a specific filetype
+    per_filetype = {
+        ["html"] = {
+            enable_close = true
+        }
+    }
+})
+
+require("oil").setup({
+    view_options = {
+        show_hidden = true,
+    },
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "oil*",
+    callback = function()
+        vim.opt_local.number = false
+        vim.opt_local.relativenumber = false
+    end,
+})
+
+vim.keymap.set("t", "<C-w>", "<C-\\><C-n><C-w>w")
 
 require("autocommands")
 require("neotest").setup({
