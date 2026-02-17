@@ -135,7 +135,7 @@ require("lazy").setup({
             ---- Fonts
             vim.g.gruvbox_material_disable_italic_comment = 1
             vim.g.gruvbox_material_enable_italic = 0
-            vim.g.gruvbox_material_enable_bold = 1
+            vim.g.gruvbox_material_enable_bold = 0
             vim.g.gruvbox_material_transparent_background = 1
             ---- Themes
             -- vim.g.gruvbox_material_foreground = 'mix'
@@ -525,13 +525,6 @@ vim.keymap.set("n", "<leader>k", "<cmd>lprev<CR>zz")
 vim.keymap.set("n", "<leader>s", ":s/\\<C-r><C-w>\\>/<C-r><C-w>/gI<Left><Left><Left>")
 vim.keymap.set({ "v", "x" }, "<leader>s", "* :s//")
 vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
-
-vim.keymap.set("n", "<leader>t", "<cmd>tabnew<CR><cmd>term<CR>a")
-vim.keymap.set("t", "<leader>t", "<C-\\><C-n>gt")
-vim.keymap.set("n", "<leader>vs", "<cmd>vsplit<CR>")
-vim.keymap.set("n", "<C-h>", "<C-w>h")
-vim.keymap.set("n", "<C-l>", "<C-w>l")
-
 
 --- MINE
 
@@ -952,7 +945,9 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
-vim.keymap.set("t", "<C-w>", "<C-\\><C-n><C-w>w")
+vim.keymap.set("t", "<C-w>", "<C-\\><C-n><C-w>")
+vim.keymap.set("n", "<leader>ec", ":e ~/.config/nvim/init.lua<CR>")
+vim.keymap.set("n", "<leader>t", ":vsplit<CR><C-w>w:term<CR>")
 
 require("autocommands")
 require("neotest").setup({
